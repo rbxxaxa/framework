@@ -74,6 +74,9 @@ stds.roblox = {
                 DescendantRemoving = read_write;
             }
         },
+        plugin = {
+            other_fields = true,
+        },
         game = {
             other_fields = true,
             fields = {

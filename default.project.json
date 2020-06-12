@@ -1,17 +1,20 @@
 {
-  "name": "Plugin Template",
+  "name": "PluginName",
   "tree": {
     "$className": "DataModel",
     "StarterGui": {
-      "$className": "StarterGui",
-      "PluginTemplate": {
-        "$className": "Folder",
-        "$path": "PluginRoot",
-        "InstanceStorage": {
-          "$className": "Folder",
-          "$ignoreUnknownInstances": true
-        }
-      }
+	  "$className": "StarterGui",
+	  "PluginName": {
+		"$className": "Folder",
+		"PluginRoot": {
+		"$className": "Folder",
+		"$path": "PluginRoot",
+		"InstanceStorage": {
+			"$className": "Folder",
+			"$ignoreUnknownInstances": true
+		}
+		}
+	  }
     }
   }
 }

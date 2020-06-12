@@ -1,6 +1,6 @@
 local PluginMain = {}
 
-function PluginMain.start(plugin)
+function PluginMain.start(params)
 
 end
 

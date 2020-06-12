@@ -2,7 +2,7 @@ if not plugin then
     return
 end
 
-local PluginRoot = script.Parent.Parent
+local PluginRoot = script:FindFirstAncestor("PluginRoot")
 local PluginMain = require(PluginRoot.Core.PluginMain)
 
 local function main()

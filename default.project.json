@@ -6,7 +6,7 @@
       "$className": "StarterGui",
       "PluginTemplate": {
         "$className": "Folder",
-        "$path": "Plugin",
+        "$path": "PluginRoot",
         "InstanceStorage": {
           "$className": "Folder",
           "$ignoreUnknownInstances": true

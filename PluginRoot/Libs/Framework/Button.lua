@@ -58,9 +58,9 @@ function Button:render()
 		[Roact.Event.InputChanged] = function(rbx, inputObject)
 			local mousePos = inputObject.Position
 			local topLeft = rbx.AbsolutePosition
-			local bottomRight = rbx.AbsolutePosition + rbx.AbsoluteSize
+			local bottomRight = rbx.AbsolutePosition + rbx.AbsoluteSize - Vector2.new(1, 1)
 			if mousePos.X >= topLeft.X and mousePos.Y >= topLeft.Y
-				and mousePos.X <= bottomRight.X-1 and mousePos.Y <= bottomRight.Y-1 then
+				and mousePos.X <= bottomRight.X and mousePos.Y <= bottomRight.Y then
 
 				self.mouseInside = true
 				self:refreshButtonState()

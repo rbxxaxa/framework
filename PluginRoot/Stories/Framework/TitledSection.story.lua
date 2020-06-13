@@ -9,9 +9,10 @@ local e = Roact.createElement
 return function(target)
 	local section = e(TitledSection, {
 		title = "TEST TITLE SECTION",
+		position = UDim2.new(0, 20, 0, 20),
+		width = UDim.new(0, 200),
 	}, {
 		Text1 = e("TextLabel", {
-			BackgroundTransparency = 1,
 			Text = "Text1",
 			Size = UDim2.fromOffset(100, 100),
 			TextStrokeColor3 = Color3.new(0, 0, 0),
@@ -20,7 +21,6 @@ return function(target)
 			LayoutOrder = 1,
 		}),
 		Text2 = e("TextLabel", {
-			BackgroundTransparency = 1,
 			Text = "Text2",
 			Size = UDim2.fromOffset(100, 100),
 			TextStrokeColor3 = Color3.new(0, 0, 0),

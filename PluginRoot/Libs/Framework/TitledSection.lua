@@ -50,22 +50,29 @@ function TitledSection:render()
 		titleText = Color3.new(1, 1, 1),
 	}
 
-	local children = props[Roact.Children] ~= nil and Oyrc.Dictionary.join(
-		props[Roact.Children],
-		{e("UIListLayout", {
+	local children = props[Roact.Children] ~= nil and Oyrc.Dictionary.join(props[Roact.Children], {
+		TitledSectionUIListLayout = e("UIListLayout", {
 			SortOrder = Enum.SortOrder.LayoutOrder,
+			Padding = UDim.new(0, 4),
 			[Roact.Change.AbsoluteContentSize] = function(rbx)
 				local contentHeight = rbx.AbsoluteContentSize.Y
 				self.updateContentHeight(contentHeight)
 			end,
-		})}
-	)
+		}),
+
+		TitledSectionUIPadding = e("UIPadding", {
+			PaddingTop = UDim.new(0, 4),
+			PaddingRight = UDim.new(0, 4),
+			PaddingBottom = UDim.new(0, 4),
+			PaddingLeft = UDim.new(0, 4),
+		})
+	})
 
 	return e("Frame", {
 		BackgroundTransparency = 1,
 		Position = position,
 		Size = self.contentHeight:map(function(height)
-			return UDim2.new(width, UDim.new(0, height + HEADER_HEIGHT))
+			return UDim2.new(width, UDim.new(0, height + HEADER_HEIGHT + 8))
 		end),
 		LayoutOrder = layoutOrder,
 	}, {

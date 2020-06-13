@@ -15,7 +15,7 @@ local TITLE_TEXT_SIZE = 16
 local TitledSection = Roact.PureComponent:extend("TitledSection")
 
 TitledSection.defaultProps = {
-	title = "TITLE",
+	title = "DEFAULT TITLE",
 	width = UDim.new(1, 0),
 	position = UDim2.new(),
 	layoutOrder = 0,
@@ -33,8 +33,7 @@ TitledSection.validateProps = function(props)
 end
 
 function TitledSection:init()
-	self.listRef = Roact.createRef()
-	self.frameRef = Roact.createRef()
+	self.contentHeight, self.updateContentHeight = Roact.createBinding(0)
 end
 
 function TitledSection:render()
@@ -55,16 +54,20 @@ function TitledSection:render()
 		props[Roact.Children],
 		{e("UIListLayout", {
 			SortOrder = Enum.SortOrder.LayoutOrder,
-			[Roact.Ref] = self.listRef,
+			[Roact.Change.AbsoluteContentSize] = function(rbx)
+				local contentHeight = rbx.AbsoluteContentSize.Y
+				self.updateContentHeight(contentHeight)
+			end,
 		})}
 	)
 
 	return e("Frame", {
 		BackgroundTransparency = 1,
 		Position = position,
-		Size = UDim2.new(width, UDim.new(0, HEADER_HEIGHT)),
+		Size = self.contentHeight:map(function(height)
+			return UDim2.new(width, UDim.new(0, height + HEADER_HEIGHT))
+		end),
 		LayoutOrder = layoutOrder,
-		[Roact.Ref] = self.frameRef,
 	}, {
 		Header = e("Frame", {
 			Size = UDim2.new(1, 0, 0, HEADER_HEIGHT),
@@ -90,31 +93,6 @@ function TitledSection:render()
 			BorderSizePixel = 0,
 		}, children)
 	})
-end
-
-function TitledSection:updateContentHeight()
-	local list = self.listRef:getValue()
-
-	local width = self.props.width
-	local contentHeight = list.AbsoluteContentSize.Y
-	self.frameRef:getValue().Size = UDim2.new(width, UDim.new(0, HEADER_HEIGHT + contentHeight))
-end
-
-function TitledSection:didMount()
-	local list = self.listRef:getValue()
-	self.heightConn = list:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-		self:updateContentHeight()
-	end)
-
-	self:updateContentHeight()
-end
-
-function TitledSection:didUpdate()
-	self:updateContentHeight()
-end
-
-function TitledSection:willUnmount()
-	self.heightConn:Disconnect()
 end
 
 return TitledSection

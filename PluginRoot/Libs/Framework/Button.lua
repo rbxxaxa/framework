@@ -93,8 +93,10 @@ end
 function Button:refreshButtonState()
 	local newState
 	if self.activated and self.mouseInside then
-		newState = "Pressed"
-	elseif self.activated or self.mouseInside then
+		newState = "PressedInside"
+	elseif self.activated and not self.mouseInside then
+		newState = "PressedOutside"
+	elseif not self.activated and self.mouseInside then
 		newState = "Hovered"
 	else
 		newState = "Default"

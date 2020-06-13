@@ -12,14 +12,18 @@ Button.defaultProps = {
 	size = UDim2.new(0, 100, 0, 100),
 	position = UDim2.new(),
 	layoutOrder = 0,
-	onClick = nil,
+	buttonStateChange = nil,
+	mouse1Click = nil,
+	mouse1Press = nil,
 }
 
 local IButton = t.interface({
 	size = t.UDim2,
 	position = t.UDim2,
 	layoutOrder = t.integer,
-	onClick = t.optional(t.callback),
+	buttonStateChange = t.optional(t.callback),
+	mouse1Click = t.optional(t.callback),
+	mouse1Press = t.optional(t.callback),
 })
 
 Button.validateProps = function(props)
@@ -29,31 +33,21 @@ end
 function Button:init()
 	self.activated = false
 	self.mouseInside = false
-	self.buttonState, self.updateButtonState = Roact.createBinding("default")
 end
 
 function Button:render()
 	local props = self.props
 	local size = props.size
 	local position = props.position
-	local onClick = props.onClick
-
-	-- TODO: theme me
-	local theme = {
-		default = Color3.new(1, 0, 0),
-		hovered = Color3.new(0, 1, 0),
-		pressed = Color3.new(0, 0, 1),
-	}
+	local mouse1Click = props.mouse1Click
+	local mouse1Press = props.mouse1Press
 
 	-- TODO: make me modal
 	return e("TextButton", {
 		Size = size,
 		Position = position,
 		Text = "",
-		BorderSizePixel = 0,
-		BackgroundColor3 = self.buttonState:map(function(buttonState)
-			return theme[buttonState]
-		end),
+		BackgroundTransparency = 1,
 		AutoButtonColor = false,
 		[Roact.Event.InputChanged] = function(rbx, inputObject)
 			local mousePos = inputObject.Position
@@ -79,14 +73,17 @@ function Button:render()
 			if inputObject.UserInputType == Enum.UserInputType.MouseButton1 then
 				self.activated = true
 				self:refreshButtonState()
+				if self.mouseInside and mouse1Press then
+					mouse1Press()
+				end
 			end
 		end,
 		[Roact.Event.InputEnded] = function(rbx, inputObject)
 			if inputObject.UserInputType == Enum.UserInputType.MouseButton1 then
 				self.activated = false
 				self:refreshButtonState()
-				if self.mouseInside and onClick then
-					onClick()
+				if self.mouseInside and mouse1Click then
+					mouse1Click()
 				end
 			end
 		end
@@ -94,12 +91,20 @@ function Button:render()
 end
 
 function Button:refreshButtonState()
+	local newState
 	if self.activated and self.mouseInside then
-		self.updateButtonState("pressed")
+		newState = "Pressed"
 	elseif self.activated or self.mouseInside then
-		self.updateButtonState("hovered")
+		newState = "Hovered"
 	else
-		self.updateButtonState("default")
+		newState = "Default"
+	end
+
+	if self.buttonState ~= newState then
+		self.buttonState = newState
+		if self.props.buttonStateChange then
+			self.props.buttonStateChange(newState)
+		end
 	end
 end
 

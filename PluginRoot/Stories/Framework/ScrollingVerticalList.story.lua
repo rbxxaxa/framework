@@ -2,22 +2,16 @@ local PluginRoot = script:FindFirstAncestor("PluginRoot")
 local load = require(PluginRoot.Loader).load
 
 local Roact = load("Roact")
-local TitledSection = load("Framework/TitledSection")
 local ScrollingVerticalList = load("Framework/ScrollingVerticalList")
 
 local e = Roact.createElement
 
 return function(target)
-	local section = e(TitledSection, {
-		title = "TEST TITLE SECTION",
+	local section = e(ScrollingVerticalList, {
+		size = UDim2.new(0, 200, 0, 200),
 		position = UDim2.new(0, 20, 0, 20),
 		width = UDim.new(0, 200),
 	}, {
-		ScrollingVerticalList = e(ScrollingVerticalList, {
-			size = UDim2.new(1, 0, 0, 200),
-			layoutOrder = 1,
-		}),
-
 		Text1 = e("TextLabel", {
 			Text = "Text1",
 			Size = UDim2.fromOffset(100, 100),

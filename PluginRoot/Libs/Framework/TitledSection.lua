@@ -93,6 +93,7 @@ function TitledSection:render()
 				TextTruncate = Enum.TextTruncate.AtEnd,
 			}),
 		}),
+
 		Content = e("Frame", {
 			BackgroundColor3 = theme.contentBackground,
 			Size = UDim2.new(1, 0, 1, -HEADER_HEIGHT),

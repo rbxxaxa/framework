@@ -20,6 +20,7 @@ return function(target)
 			TextColor3 = Color3.new(1, 1, 1),
 			LayoutOrder = 1,
 		}),
+
 		Text2 = e("TextLabel", {
 			Text = "Text2",
 			Size = UDim2.fromOffset(100, 100),

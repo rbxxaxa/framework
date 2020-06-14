@@ -22,6 +22,7 @@ ScrollingVerticalList.defaultProps = {
 	paddingBottom = 4,
 	paddingLeft = 4,
 	paddingList = 4,
+	contentBackgroundColor = nil,
 }
 
 local IScrollingVerticalList = t.interface({
@@ -34,6 +35,7 @@ local IScrollingVerticalList = t.interface({
 	paddingBottom = t.integer,
 	paddingLeft = t.integer,
 	paddingList = t.integer,
+	contentBackgroundColor = t.optional(t.Color3),
 })
 
 ScrollingVerticalList.validateProps = function(props)
@@ -55,6 +57,7 @@ function ScrollingVerticalList:render()
 	local paddingBottom = props.paddingBottom
 	local paddingLeft = props.paddingLeft
 	local paddingList = props.paddingList
+	local contentBackgroundColor = props.contentBackgroundColor
 
 	-- TODO: Theme me
 	local theme = {
@@ -91,7 +94,7 @@ function ScrollingVerticalList:render()
 	}, {
 		ContentBackground = e("Frame", {
 			Size = UDim2.new(1, -SCROLL_BAR_THICKNESS, 1, 0),
-			BackgroundColor3 = theme.contentBackground,
+			BackgroundColor3 = contentBackgroundColor or theme.contentBackground,
 			BorderSizePixel = 0,
 		}),
 

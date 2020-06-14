@@ -40,8 +40,7 @@ function Dropdown:init()
 		open = false,
 	}
 
-	self.hoveredEntry, self.updateHoveredEntry = Roact.createBinding(0)
-	self.choiceHeight, self.updateEntryHeight = Roact.createBinding(self.props.size.Y.Offset)
+	self.choiceHeight, self.updateChoiceHeight = Roact.createBinding(self.props.size.Y.Offset)
 	self.onDropdownButtonPressed = function()
 		self:setState({
 			open = true,
@@ -117,7 +116,7 @@ function Dropdown:render()
 		layoutOrder = layoutOrder,
 		mouse1Pressed = self.onDropdownButtonPressed,
 		[Roact.Change.AbsoluteSize] = function(rbx)
-			self.updateEntryHeight(rbx.AbsoluteSize.Y)
+			self.updateChoiceHeight(rbx.AbsoluteSize.Y)
 		end,
 	}, children)
 end

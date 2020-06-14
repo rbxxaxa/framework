@@ -17,18 +17,19 @@ Dropdown.defaultProps = {
 	maxRows = 6,
 	choices = nil,
 	buttonDisplay = nil,
-	selected = nil,
+	choiceSelected = nil,
+	hoveredIndexChanged = nil,
 }
 
 local IDropdown = t.interface({
 	size = t.UDim2,
-	choiceSize = t.UDim2,
 	position = t.UDim2,
 	layoutOrder = t.integer,
 	maxRows = t.integer,
 	choices = t.optional(t.table),
 	buttonDisplay = t.optional(t.table),
-	selected = t.optional(t.callback),
+	choiceSelected = t.optional(t.callback),
+	hoveredIndexChanged = t.optional(t.callback),
 })
 
 Dropdown.validateProps = function(props)
@@ -56,7 +57,8 @@ function Dropdown:render()
 	local maxRows = props.maxRows
 	local choices = props.choices
 	local buttonDisplay = props.buttonDisplay
-	local selected = props.selected
+	local choiceSelected = props.choiceSelected
+	local hoveredIndexChanged = props.hoveredIndexChanged
 
 	-- TODO: theme me
 	local theme = {
@@ -78,17 +80,27 @@ function Dropdown:render()
 
 	local scrollingFrameChildren = {}
 	if choices then
-		for i, choice in ipairs(choices) do
-			scrollingFrameChildren[i] = e(Button,{
-				size = self.choiceHeight:map(function(height) return UDim2.new(1, 0, 0, height) end),
-				layoutOrder = i,
+		for choiceIndex, choice in ipairs(choices) do
+			scrollingFrameChildren[choiceIndex] = e(Button,{
+				sizeBinding = self.choiceHeight:map(function(height) return UDim2.new(1, 0, 0, height) end),
+				layoutOrder = choiceIndex,
 				mouse1Pressed = function()
-					if selected then
-						selected(i, choice.data)
+					if choiceSelected then
+						choiceSelected(choiceIndex, choice.data)
 					end
 					self:setState({
 						open = false
 					})
+					if hoveredIndexChanged then
+						hoveredIndexChanged(0)
+					end
+				end,
+				buttonStateChanged = function(buttonState)
+					if buttonState == "Hovered" then
+						if hoveredIndexChanged then
+							hoveredIndexChanged(choiceIndex)
+						end
+					end
 				end,
 			}, {
 				choice.display,

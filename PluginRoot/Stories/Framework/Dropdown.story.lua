@@ -46,7 +46,7 @@ return function(target)
 			position = UDim2.new(0, 20, 0, 20),
 			size = UDim2.new(0, 100, 0, 24),
 			choices = choices,
-			selected = function(idx, data)
+			choiceSelected = function(idx, data)
 				self:setState({
 					selected = data,
 				})

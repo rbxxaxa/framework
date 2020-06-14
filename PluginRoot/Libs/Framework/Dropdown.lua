@@ -81,29 +81,34 @@ function Dropdown:render()
 	local scrollingFrameChildren = {}
 	if choices then
 		for choiceIndex, choice in ipairs(choices) do
-			scrollingFrameChildren[choiceIndex] = e(Button,{
-				sizeBinding = self.choiceHeight:map(function(height) return UDim2.new(1, 0, 0, height) end),
-				layoutOrder = choiceIndex,
-				mouse1Pressed = function()
-					if choiceSelected then
-						choiceSelected(choiceIndex, choice.data)
-					end
-					self:setState({
-						open = false
-					})
-					if hoveredIndexChanged then
-						hoveredIndexChanged(0)
-					end
-				end,
-				buttonStateChanged = function(buttonState)
-					if buttonState == "Hovered" then
-						if hoveredIndexChanged then
-							hoveredIndexChanged(choiceIndex)
-						end
-					end
-				end,
+			scrollingFrameChildren[choiceIndex] = e("Frame", {
+				BackgroundTransparency = 1,
+				Size = self.choiceHeight:map(function(height) return UDim2.new(1, 0, 0, height) end),
+				LayoutOrder = choiceIndex,
 			}, {
-				choice.display,
+				ChoiceButton = e(Button, {
+					size = UDim2.new(1, 0, 1, 0),
+					mouse1Pressed = function()
+						if choiceSelected then
+							choiceSelected(choiceIndex, choice.data)
+						end
+						self:setState({
+							open = false
+						})
+						if hoveredIndexChanged then
+							hoveredIndexChanged(0)
+						end
+					end,
+					buttonStateChanged = function(buttonState)
+						if buttonState == "Hovered" then
+							if hoveredIndexChanged then
+								hoveredIndexChanged(choiceIndex)
+							end
+						end
+					end,
+				}, {
+					choice.display,
+				})
 			})
 		end
 	end

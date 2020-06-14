@@ -17,6 +17,11 @@ ScrollingVerticalList.defaultProps = {
 	size = UDim2.new(0, 100, 0, 100),
 	layoutOrder = 0,
 	visible = true,
+	paddingTop = 4,
+	paddingRight = 4,
+	paddingBottom = 4,
+	paddingLeft = 4,
+	paddingList = 4,
 }
 
 local IScrollingVerticalList = t.interface({
@@ -24,6 +29,11 @@ local IScrollingVerticalList = t.interface({
 	size = t.UDim2,
 	layoutOrder = t.integer,
 	visible = t.boolean,
+	paddingTop = t.integer,
+	paddingRight = t.integer,
+	paddingBottom = t.integer,
+	paddingLeft = t.integer,
+	paddingList = t.integer,
 })
 
 ScrollingVerticalList.validateProps = function(props)
@@ -40,6 +50,11 @@ function ScrollingVerticalList:render()
 	local size = props.size
 	local layoutOrder = props.layoutOrder
 	local visible = props.visible
+	local paddingTop = props.paddingTop
+	local paddingRight = props.paddingRight
+	local paddingBottom = props.paddingBottom
+	local paddingLeft = props.paddingLeft
+	local paddingList = props.paddingList
 
 	-- TODO: Theme me
 	local theme = {
@@ -51,7 +66,7 @@ function ScrollingVerticalList:render()
 	local children = props[Roact.Children] ~= nil and Oyrc.Dictionary.join(props[Roact.Children], {
 		ScrollingVerticalListUIListLayout = e("UIListLayout", {
 			SortOrder = Enum.SortOrder.LayoutOrder,
-			Padding = UDim.new(0, 4),
+			Padding = UDim.new(0, paddingList),
 			[Roact.Change.AbsoluteContentSize] = function(rbx)
 				local contentHeight = rbx.AbsoluteContentSize.Y
 				self.updateContentHeight(contentHeight)
@@ -59,10 +74,10 @@ function ScrollingVerticalList:render()
 		}),
 
 		ScrollingVerticalListUIPadding = e("UIPadding", {
-			PaddingTop = UDim.new(0, 4),
-			PaddingRight = UDim.new(0, 4 + SCROLL_BAR_THICKNESS),
-			PaddingBottom = UDim.new(0, 4),
-			PaddingLeft = UDim.new(0, 4),
+			PaddingTop = UDim.new(0, paddingTop),
+			PaddingRight = UDim.new(0, paddingRight + SCROLL_BAR_THICKNESS),
+			PaddingBottom = UDim.new(0, paddingBottom),
+			PaddingLeft = UDim.new(0, paddingLeft),
 		})
 	})
 
@@ -96,7 +111,7 @@ function ScrollingVerticalList:render()
 			ScrollingDirection = Enum.ScrollingDirection.Y,
 			ScrollBarThickness = SCROLL_BAR_THICKNESS,
 			CanvasSize = self.contentHeight:map(function(height)
-				return UDim2.new(1, 0, 0, height + 8)
+				return UDim2.new(1, 0, 0, height + paddingTop + paddingBottom)
 			end),
 			TopImage = "rbxassetid://2245002518",
 			BottomImage = "rbxassetid://2245002518",

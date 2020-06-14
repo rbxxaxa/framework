@@ -11,10 +11,15 @@ return function(target)
 		size = UDim2.new(0, 200, 0, 200),
 		position = UDim2.new(0, 20, 0, 20),
 		width = UDim.new(0, 200),
+		paddingTop = 12,
+		paddingRight = 12,
+		paddingBottom = 12,
+		paddingLeft = 12,
+		paddingList = 12,
 	}, {
 		Text1 = e("TextLabel", {
 			Text = "Text1",
-			Size = UDim2.fromOffset(100, 100),
+			Size = UDim2.new(0, 100, 0, 100),
 			TextStrokeColor3 = Color3.new(0, 0, 0),
 			TextStrokeTransparency = 0,
 			TextColor3 = Color3.new(1, 1, 1),
@@ -23,7 +28,7 @@ return function(target)
 
 		Text2 = e("TextLabel", {
 			Text = "Text2",
-			Size = UDim2.fromOffset(100, 100),
+			Size = UDim2.new(1, 0, 0, 100),
 			TextStrokeColor3 = Color3.new(0, 0, 0),
 			TextStrokeTransparency = 0,
 			TextColor3 = Color3.new(1, 1, 1),

@@ -10,7 +10,9 @@ local Button = Roact.Component:extend("Button")
 
 Button.defaultProps = {
 	size = UDim2.new(0, 100, 0, 100),
+	sizeBinding = nil,
 	position = UDim2.new(),
+	positionBinding = nil,
 	layoutOrder = 0,
 	buttonStateChanged = nil,
 	mouse1Clicked = nil,
@@ -18,8 +20,10 @@ Button.defaultProps = {
 }
 
 local IButton = t.interface({
-	size = t.UDim2,
-	position = t.UDim2,
+	size = t.optional(t.UDim2),
+	sizeBinding = t.optional(t.table),
+	position = t.optional(t.UDim2),
+	positionBinding = t.optional(t.table),
 	layoutOrder = t.integer,
 	buttonStateChanged = t.optional(t.callback),
 	mouse1Clicked = t.optional(t.callback),
@@ -27,7 +31,7 @@ local IButton = t.interface({
 })
 
 Button.validateProps = function(props)
-    return IButton(props)
+	return IButton(props)
 end
 
 function Button:init()
@@ -38,14 +42,16 @@ end
 function Button:render()
 	local props = self.props
 	local size = props.size
+	local sizeBinding = props.sizeBinding
 	local position = props.position
+	local positionBinding = props.positionBinding
 	local mouse1Clicked = props.mouse1Clicked
 	local mouse1Pressed = props.mouse1Pressed
 
 	-- TODO: make me modal
 	return e("TextButton", {
-		Size = size,
-		Position = position,
+		Size = sizeBinding or size,
+		Position = positionBinding or position,
 		Text = "",
 		BackgroundTransparency = 1,
 		AutoButtonColor = false,

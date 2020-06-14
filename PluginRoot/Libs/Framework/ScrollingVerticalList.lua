@@ -60,7 +60,7 @@ function ScrollingVerticalList:render()
 
 		ScrollingVerticalListUIPadding = e("UIPadding", {
 			PaddingTop = UDim.new(0, 4),
-			PaddingRight = UDim.new(0, 4),
+			PaddingRight = UDim.new(0, 4 + SCROLL_BAR_THICKNESS),
 			PaddingBottom = UDim.new(0, 4),
 			PaddingLeft = UDim.new(0, 4),
 		})

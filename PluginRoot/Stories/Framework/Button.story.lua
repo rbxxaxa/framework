@@ -14,13 +14,13 @@ return function(target)
 	local button  = e(Button, {
 		size = UDim2.new(0, 100, 0, 100),
 		position = UDim2.new(0, 100, 0, 100),
-		mouse1Press = function()
+		mouse1Pressed = function()
 			updatePressCount(pressCount:getValue() + 1)
 		end,
-		mouse1Click = function()
+		mouse1Clicked = function()
 			updateClickCount(clickCount:getValue() + 1)
 		end,
-		buttonStateChange = updateButtonState,
+		buttonStateChanged = updateButtonState,
 	}, {
 		Frame = e("Frame", {
 			Size = UDim2.new(1, 0, 1, 0),

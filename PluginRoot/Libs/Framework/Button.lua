@@ -12,18 +12,18 @@ Button.defaultProps = {
 	size = UDim2.new(0, 100, 0, 100),
 	position = UDim2.new(),
 	layoutOrder = 0,
-	buttonStateChange = nil,
-	mouse1Click = nil,
-	mouse1Press = nil,
+	buttonStateChanged = nil,
+	mouse1Clicked = nil,
+	mouse1Pressed = nil,
 }
 
 local IButton = t.interface({
 	size = t.UDim2,
 	position = t.UDim2,
 	layoutOrder = t.integer,
-	buttonStateChange = t.optional(t.callback),
-	mouse1Click = t.optional(t.callback),
-	mouse1Press = t.optional(t.callback),
+	buttonStateChanged = t.optional(t.callback),
+	mouse1Clicked = t.optional(t.callback),
+	mouse1Pressed = t.optional(t.callback),
 })
 
 Button.validateProps = function(props)
@@ -39,8 +39,8 @@ function Button:render()
 	local props = self.props
 	local size = props.size
 	local position = props.position
-	local mouse1Click = props.mouse1Click
-	local mouse1Press = props.mouse1Press
+	local mouse1Clicked = props.mouse1Clicked
+	local mouse1Pressed = props.mouse1Pressed
 
 	-- TODO: make me modal
 	return e("TextButton", {
@@ -73,8 +73,8 @@ function Button:render()
 			if inputObject.UserInputType == Enum.UserInputType.MouseButton1 then
 				self.activated = true
 				self:refreshButtonState()
-				if self.mouseInside and mouse1Press then
-					mouse1Press()
+				if self.mouseInside and mouse1Pressed then
+					mouse1Pressed()
 				end
 			end
 		end,
@@ -82,8 +82,8 @@ function Button:render()
 			if inputObject.UserInputType == Enum.UserInputType.MouseButton1 then
 				self.activated = false
 				self:refreshButtonState()
-				if self.mouseInside and mouse1Click then
-					mouse1Click()
+				if self.mouseInside and mouse1Clicked then
+					mouse1Clicked()
 				end
 			end
 		end
@@ -104,8 +104,8 @@ function Button:refreshButtonState()
 
 	if self.buttonState ~= newState then
 		self.buttonState = newState
-		if self.props.buttonStateChange then
-			self.props.buttonStateChange(newState)
+		if self.props.buttonStateChanged then
+			self.props.buttonStateChanged(newState)
 		end
 	end
 end

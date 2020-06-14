@@ -11,6 +11,8 @@ return function(target)
 		size = UDim2.new(0, 100, 0, 100),
 		position = UDim2.new(0, 100, 0, 100),
 		borderStyle = "Square",
+		backgroundColor = Color3.new(0, 1, 0),
+		borderColor = Color3.new(0, 0, 1),
 	}, {
 		Text = e("TextLabel", {
 			BackgroundTransparency = 1,
@@ -27,6 +29,8 @@ return function(target)
 		size = UDim2.new(0, 100, 0, 100),
 		position = UDim2.new(0, 100, 0, 220),
 		borderStyle = "Round",
+		backgroundColor = Color3.new(1, 0, 0),
+		borderColor = Color3.new(0, 1, 0),
 	}, {
 		Text = e("TextLabel", {
 			BackgroundTransparency = 1,

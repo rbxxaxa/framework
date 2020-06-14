@@ -13,8 +13,8 @@ local RECT_SIZE = Vector2.new(10, 10)
 local SLICE_CENTER = Rect.new(4, 4, 5, 5)
 
 BorderedFrame.defaultProps = {
-	borderColor3 = Color3.new(0, 0, 0),
-	backgroundColor3 = Color3.new(1, 1, 1),
+	borderColor = Color3.new(0, 0, 0),
+	backgroundColor = Color3.new(1, 1, 1),
 	size = UDim2.new(0, 100, 0, 100),
 	position = UDim2.new(0, 0, 0, 0),
 	anchorPoint = Vector2.new(0, 0),
@@ -27,8 +27,8 @@ BorderedFrame.defaultProps = {
 }
 
 local IBorderedFrame = t.interface({
-	borderColor3 = t.Color3,
-	backgroundColor3 = t.Color3,
+	borderColor = t.Color3,
+	backgroundColor = t.Color3,
 	size = t.UDim2,
 	position = t.UDim2,
 	anchorPoint = t.Vector2,
@@ -46,8 +46,8 @@ end
 
 function BorderedFrame:render()
 	local props = self.props
-	local borderColor3 = props.borderColor3
-	local backgroundColor3 = props.backgroundColor3
+	local borderColor = props.borderColor
+	local backgroundColor = props.backgroundColor
 	local size = props.size
 	local position = props.position
 	local anchorPoint = props.AnchorPoint
@@ -77,7 +77,7 @@ function BorderedFrame:render()
 		BackgroundTransparency = 1,
 		Image = fillImage,
 		ImageTransparency = backgroundTransparency,
-		ImageColor3 = backgroundColor3,
+		ImageColor3 = backgroundColor,
 		ScaleType = Enum.ScaleType.Slice,
 		ImageRectOffset = RECT_OFFSET,
 		ImageRectSize = RECT_SIZE,
@@ -88,7 +88,7 @@ function BorderedFrame:render()
 			Size = UDim2.new(1, 0, 1, 0),
 			BackgroundTransparency = 1,
 			Image = borderImage,
-			ImageColor3 = borderColor3,
+			ImageColor3 = borderColor,
 			ScaleType = Enum.ScaleType.Slice,
 			ImageRectOffset = RECT_OFFSET,
 			ImageRectSize = RECT_SIZE,

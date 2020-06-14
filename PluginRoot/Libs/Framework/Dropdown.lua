@@ -63,6 +63,8 @@ function Dropdown:init()
 	}
 
 	self.choiceHeight, self.updateChoiceHeight = Roact.createBinding(self.props.size.Y.Offset)
+	self.canvasOffset, self.updateCanvasOffset = Roact.createBinding(0)
+	self.hoveredIndex = 0
 	self.onDropdownButtonPressed = function()
 		self:setState({
 			open = true,
@@ -121,14 +123,22 @@ function Dropdown:render()
 						self:setState({
 							open = false
 						})
+						self.hoveredIndex = 0
 						if hoveredIndexChanged then
 							hoveredIndexChanged(0)
 						end
+						self.updateCanvasOffset(0)
 					end,
 					buttonStateChanged = function(buttonState)
 						if buttonState == "Hovered" then
+							self.hoveredIndex = choiceIndex
 							if hoveredIndexChanged then
 								hoveredIndexChanged(choiceIndex)
+							end
+						elseif self.hoveredIndex == choiceIndex then
+							self.hoveredIndex = 0
+							if hoveredIndexChanged then
+								hoveredIndexChanged(0)
 							end
 						end
 					end,
@@ -139,16 +149,18 @@ function Dropdown:render()
 		end
 	end
 
-	children.EntriesScrollingFrame = e(ScrollingVerticalList, {
+	children.EntriesScrollingFrame = self.state.open and e(ScrollingVerticalList, {
 		position = UDim2.new(0, 0, 1, 4),
 		size = UDim2.new(1, 0, math.min(maxRows, numberOfChoices), 0),
-		visible = self.state.open,
 		paddingTop = 0,
 		paddingRight = 0,
 		paddingBottom = 0,
 		paddingLeft = 0,
 		paddingList = 0,
 		contentBackgroundColor = theme.choicesBackground,
+		CanvasPosition = self.canvasOffset:map(function(offset)
+			return Vector2.new(0, offset)
+		end),
 	}, scrollingFrameChildren)
 
 	-- TODO: make me modal

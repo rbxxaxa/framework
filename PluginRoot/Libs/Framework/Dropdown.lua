@@ -36,16 +36,11 @@ Dropdown.validateProps = function(props)
 end
 
 function Dropdown:init()
-	self.state = {
-		open = false,
-	}
-
 	self.hoveredEntry, self.updateHoveredEntry = Roact.createBinding(0)
 	self.choiceHeight, self.updateEntryHeight = Roact.createBinding(self.props.size.Y.Offset)
+	self.open, self.updateOpen = Roact.createBinding(false)
 	self.onDropdownButtonPressed = function()
-		self:setState({
-			open = true,
-		})
+		self.updateOpen(true)
 	end
 end
 
@@ -87,9 +82,7 @@ function Dropdown:render()
 					if selected then
 						selected(i, choice.data)
 					end
-					self:setState({
-						open = false
-					})
+					self.updateOpen(false)
 				end,
 			}, {
 				choice.display,
@@ -100,7 +93,7 @@ function Dropdown:render()
 	children.EntriesScrollingFrame = e(ScrollingVerticalList, {
 		position = UDim2.new(0, 0, 1, 4),
 		size = UDim2.new(1, 0, math.min(maxRows, choices and #choices or 0), 0),
-		visible = self.state.open,
+		visible = self.open:map(function(open) return open end),
 		paddingTop = 0,
 		paddingRight = 0,
 		paddingBottom = 0,

@@ -15,10 +15,11 @@ Dropdown.defaultProps = {
 	position = UDim2.new(),
 	layoutOrder = 0,
 	maxRows = 6,
-	choices = nil,
 	buttonDisplay = nil,
 	choiceSelected = nil,
 	hoveredIndexChanged = nil,
+	choiceDatas = nil,
+	choiceDisplays = nil,
 }
 
 local IDropdown = t.interface({
@@ -26,14 +27,34 @@ local IDropdown = t.interface({
 	position = t.UDim2,
 	layoutOrder = t.integer,
 	maxRows = t.integer,
-	choices = t.optional(t.table),
 	buttonDisplay = t.optional(t.table),
 	choiceSelected = t.optional(t.callback),
 	hoveredIndexChanged = t.optional(t.callback),
+	choiceDatas = t.optional(t.table),
+	choiceDisplays = t.optional(t.table),
 })
 
 Dropdown.validateProps = function(props)
-	return IDropdown(props)
+	local ok, err = IDropdown(props)
+	if not ok then
+		return false, err
+	end
+
+	local choiceDatas, choiceDisplays = props.choiceDatas, props.choiceDisplays
+	if choiceDatas == nil and choiceDisplays ~= nil then
+		return false, "choiceDisplay was provided but choiceDatas is missing."
+	end
+	if choiceDatas ~= nil and choiceDisplays == nil then
+		return false, "choiceDatas was provided but choiceDisplays is missing."
+	end
+
+	if choiceDatas ~= nil and choiceDisplays ~= nil then
+		if #choiceDatas ~= #choiceDisplays then
+			return false, "number of choiceDatas and choiceDisplays do not match."
+		end
+	end
+
+	return true
 end
 
 function Dropdown:init()
@@ -55,10 +76,13 @@ function Dropdown:render()
 	local position = props.position
 	local layoutOrder = props.layoutOrder
 	local maxRows = props.maxRows
-	local choices = props.choices
 	local buttonDisplay = props.buttonDisplay
 	local choiceSelected = props.choiceSelected
 	local hoveredIndexChanged = props.hoveredIndexChanged
+	local choiceDatas = props.choiceDatas
+	local choiceDisplays = props.choiceDisplays
+
+	local numberOfChoices = choiceDatas and #choiceDatas or 0
 
 	-- TODO: theme me
 	local theme = {
@@ -79,8 +103,10 @@ function Dropdown:render()
 	})
 
 	local scrollingFrameChildren = {}
-	if choices then
-		for choiceIndex, choice in ipairs(choices) do
+	if numberOfChoices > 0 then
+		for choiceIndex = 1, numberOfChoices do
+			local choiceDisplay = choiceDisplays[choiceIndex]
+			local choiceData = choiceDatas[choiceIndex]
 			scrollingFrameChildren[choiceIndex] = e("Frame", {
 				BackgroundTransparency = 1,
 				Size = self.choiceHeight:map(function(height) return UDim2.new(1, 0, 0, height) end),
@@ -90,7 +116,7 @@ function Dropdown:render()
 					size = UDim2.new(1, 0, 1, 0),
 					mouse1Pressed = function()
 						if choiceSelected then
-							choiceSelected(choiceIndex, choice.data)
+							choiceSelected(choiceIndex, choiceData)
 						end
 						self:setState({
 							open = false
@@ -107,7 +133,7 @@ function Dropdown:render()
 						end
 					end,
 				}, {
-					choice.display,
+					choiceDisplay,
 				})
 			})
 		end
@@ -115,7 +141,7 @@ function Dropdown:render()
 
 	children.EntriesScrollingFrame = e(ScrollingVerticalList, {
 		position = UDim2.new(0, 0, 1, 4),
-		size = UDim2.new(1, 0, math.min(maxRows, choices and #choices or 0), 0),
+		size = UDim2.new(1, 0, math.min(maxRows, numberOfChoices), 0),
 		visible = self.state.open,
 		paddingTop = 0,
 		paddingRight = 0,

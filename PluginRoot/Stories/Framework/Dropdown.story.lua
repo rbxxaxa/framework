@@ -29,23 +29,23 @@ return function(target)
 			TextColor3 = Color3.new(1, 1, 1),
 		})
 
-		local choices = {}
+		local choiceDatas = {}
+		local choiceDisplays = {}
 		for i = 1, 10 do
-			choices[i] = {
-				data = i,
-				display = e("TextLabel", {
-					Text = "Choice " .. i,
-					BackgroundTransparency = 1,
-					Size = UDim2.new(1, 0, 1, 0),
-					TextColor3 = Color3.new(1, 1, 1),
-				})
-			}
+			choiceDatas[i] = i
+			choiceDisplays[i] = e("TextLabel", {
+				Text = "Choice " .. i,
+				BackgroundTransparency = 1,
+				Size = UDim2.new(1, 0, 1, 0),
+				TextColor3 = Color3.new(1, 1, 1),
+			})
 		end
 
 		local dropdown = e(Dropdown, {
 			position = UDim2.new(0, 20, 0, 20),
 			size = UDim2.new(0, 100, 0, 24),
-			choices = choices,
+			choiceDatas = choiceDatas,
+			choiceDisplays = choiceDisplays,
 			choiceSelected = function(idx, data)
 				self:setState({
 					selected = data,

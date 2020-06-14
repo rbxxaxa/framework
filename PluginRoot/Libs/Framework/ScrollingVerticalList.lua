@@ -16,7 +16,6 @@ ScrollingVerticalList.defaultProps = {
 	position = UDim2.new(),
 	size = UDim2.new(0, 100, 0, 100),
 	layoutOrder = 0,
-	visible = true,
 	paddingTop = 4,
 	paddingRight = 4,
 	paddingBottom = 4,
@@ -29,7 +28,6 @@ local IScrollingVerticalList = t.interface({
 	position = t.UDim2,
 	size = t.UDim2,
 	layoutOrder = t.integer,
-	visible = t.boolean,
 	paddingTop = t.integer,
 	paddingRight = t.integer,
 	paddingBottom = t.integer,
@@ -51,7 +49,6 @@ function ScrollingVerticalList:render()
 	local position = props.position
 	local size = props.size
 	local layoutOrder = props.layoutOrder
-	local visible = props.visible
 	local paddingTop = props.paddingTop
 	local paddingRight = props.paddingRight
 	local paddingBottom = props.paddingBottom
@@ -90,7 +87,6 @@ function ScrollingVerticalList:render()
 		Position = position,
 		Size = size,
 		LayoutOrder = layoutOrder,
-		Visible = visible,
 	}, {
 		ContentBackground = e("Frame", {
 			Size = UDim2.new(1, -SCROLL_BAR_THICKNESS, 1, 0),

@@ -82,7 +82,7 @@ function ScrollingVerticalList:render()
 			PaddingBottom = UDim.new(0, paddingBottom),
 			PaddingLeft = UDim.new(0, paddingLeft),
 		})
-	})
+	}) or nil
 
 	-- TODO: Use modal to disable scrolling when necessary
 	return e("Frame", {

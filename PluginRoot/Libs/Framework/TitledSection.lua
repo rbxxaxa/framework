@@ -66,7 +66,7 @@ function TitledSection:render()
 			PaddingBottom = UDim.new(0, 4),
 			PaddingLeft = UDim.new(0, 4),
 		})
-	})
+	}) or nil
 
 	return e("Frame", {
 		BackgroundTransparency = 1,

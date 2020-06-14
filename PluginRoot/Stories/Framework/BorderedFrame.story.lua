@@ -7,6 +7,11 @@ local BorderedFrame = load("Framework/BorderedFrame")
 local e = Roact.createElement
 
 return function(target)
+	Roact.setGlobalConfig({
+		typeChecks = true,
+		propValidation = true,
+	})
+
 	local squareFrame = e(BorderedFrame, {
 		size = UDim2.new(0, 100, 0, 100),
 		position = UDim2.new(0, 100, 0, 100),

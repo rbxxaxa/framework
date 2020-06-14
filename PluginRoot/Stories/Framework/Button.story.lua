@@ -7,6 +7,11 @@ local Button = load("Framework/Button")
 local e = Roact.createElement
 
 return function(target)
+	Roact.setGlobalConfig({
+		typeChecks = true,
+		propValidation = true,
+	})
+
 	local pressCount, updatePressCount = Roact.createBinding(0)
 	local clickCount, updateClickCount = Roact.createBinding(0)
 	local buttonState, updateButtonState = Roact.createBinding("Default")

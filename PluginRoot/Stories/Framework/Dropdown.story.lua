@@ -7,6 +7,11 @@ local Dropdown = load("Framework/Dropdown")
 local e = Roact.createElement
 
 return function(target)
+	Roact.setGlobalConfig({
+		typeChecks = true,
+		propValidation = true,
+	})
+
 	local DropdownStory = Roact.Component:extend("DropdownStory")
 
 	function DropdownStory:init()

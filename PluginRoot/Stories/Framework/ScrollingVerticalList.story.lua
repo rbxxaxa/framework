@@ -7,6 +7,11 @@ local ScrollingVerticalList = load("Framework/ScrollingVerticalList")
 local e = Roact.createElement
 
 return function(target)
+	Roact.setGlobalConfig({
+		typeChecks = true,
+		propValidation = true,
+	})
+
 	local section = e(ScrollingVerticalList, {
 		size = UDim2.new(0, 200, 0, 200),
 		position = UDim2.new(0, 20, 0, 20),

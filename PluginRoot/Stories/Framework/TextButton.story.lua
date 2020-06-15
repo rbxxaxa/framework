@@ -12,19 +12,10 @@ return function(target)
 		propValidation = true,
 	})
 
-	local pressCount, updatePressCount = Roact.createBinding(0)
-	local clickCount, updateClickCount = Roact.createBinding(0)
-
 	local button  = e(TextButton, {
 		size = UDim2.new(0, 100, 0, 100),
 		position = UDim2.new(0, 100, 0, 100),
-		mouse1Pressed = function()
-			updatePressCount(pressCount:getValue() + 1)
-		end,
-		mouse1Clicked = function()
-			updateClickCount(clickCount:getValue() + 1)
-		end,
-		text = "ASDF",
+		text = "Test Button",
 	})
 	local handle = Roact.mount(button, target)
 

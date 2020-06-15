@@ -63,6 +63,16 @@ function Button:render()
 				self:refreshButtonState()
 			end
 		end,
+		[Roact.Event.MouseEnter] = function(rbx, x, y)
+			local topLeft = rbx.AbsolutePosition
+			local bottomRight = rbx.AbsolutePosition + rbx.AbsoluteSize - Vector2.new(1, 1)
+			if x >= topLeft.X and y >= topLeft.Y
+				and x <= bottomRight.X and y <= bottomRight.Y then
+
+				self.mouseInside = true
+				self:refreshButtonState()
+			end
+		end,
 		[Roact.Event.MouseLeave] = function()
 			self.mouseInside = false
 			self:refreshButtonState()

@@ -86,6 +86,8 @@ function TextDropdown:render()
 	local choiceTexts = props.choiceTexts
 
 	return ThemeContext.withConsumer(function(theme)
+		local colors = theme.colors
+
 		local choiceDisplays = nil
 		if choiceDatas then
 			choiceDisplays = {}
@@ -100,7 +102,7 @@ function TextDropdown:render()
 			Text = buttonText,
 			TextXAlignment = Enum.TextXAlignment.Left,
 			BackgroundTransparency = 1,
-			TextColor3 = Color3.new(1, 1, 1),
+			TextColor3 = colors.MainText.Default,
 		})
 
 		return e(Dropdown, {

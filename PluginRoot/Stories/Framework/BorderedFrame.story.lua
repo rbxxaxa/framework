@@ -3,6 +3,7 @@ local load = require(PluginRoot.Loader).load
 
 local Roact = load("Roact")
 local BorderedFrame = load("Framework/BorderedFrame")
+local StoryWrapper = load("Stories/StoryWrapper")
 
 local e = Roact.createElement
 
@@ -46,7 +47,7 @@ return function(target)
 			TextColor3 = Color3.new(1, 1, 1),
 		}),
 	})
-	local roundHandle = Roact.mount(roundFrame, target)
+	local roundHandle = Roact.mount(StoryWrapper(roundFrame), target)
 
 	return function()
 		Roact.unmount(squareHandle)

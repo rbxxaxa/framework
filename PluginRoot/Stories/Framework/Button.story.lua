@@ -3,6 +3,7 @@ local load = require(PluginRoot.Loader).load
 
 local Roact = load("Roact")
 local Button = load("Framework/Button")
+local StoryWrapper = load("Stories/StoryWrapper")
 
 local e = Roact.createElement
 
@@ -44,7 +45,7 @@ return function(target)
 			ZIndex = 2,
 		}),
 	})
-	local handle = Roact.mount(button, target)
+	local handle = Roact.mount(StoryWrapper(button), target)
 
 	return function()
 		Roact.unmount(handle)

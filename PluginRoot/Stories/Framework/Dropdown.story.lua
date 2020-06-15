@@ -3,6 +3,7 @@ local load = require(PluginRoot.Loader).load
 
 local Roact = load("Roact")
 local Dropdown = load("Framework/Dropdown")
+local StoryWrapper = load("Stories/StoryWrapper")
 
 local e = Roact.createElement
 
@@ -58,7 +59,7 @@ return function(target)
 	end
 
 
-	local handle = Roact.mount(e(DropdownStory), target)
+	local handle = Roact.mount(StoryWrapper(e(DropdownStory)), target)
 
 	return function()
 		Roact.unmount(handle)

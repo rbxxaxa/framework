@@ -4,6 +4,7 @@ local load = require(PluginRoot.Loader).load
 local Roact = load("Roact")
 local t = load("t")
 local Button = load("Framework/Button")
+local ThemeContext = load("Framework/ThemeContext")
 
 local e = Roact.createElement
 
@@ -47,38 +48,33 @@ function TextButton:render()
 	local mouse1Clicked = props.mouse1Clicked
 	local mouse1Pressed = props.mouse1Pressed
 
-	-- TODOL theme me
-	local theme = {
-		textColor = Color3.new(1, 1, 1),
-		buttonColor = {
-			Default = Color3.new(0, 0, 0),
-			Hovered = Color3.new(0, 1, 0),
-			PressedIn = Color3.new(0, 0, 1),
-			PressedOut = Color3.new(0, 1, 1),
-		},
-	}
+	return ThemeContext.withConsumer(function(theme)
+		local colors = theme.colors
 
-	-- TODO: make me modal
-	return e(Button, {
-		size = size,
-		position = position,
-		layoutOrder = layoutOrder,
-		buttonStateChanged = self.updateButtonState,
-		mouse1Clicked = mouse1Clicked,
-		mouse1Pressed = mouse1Pressed,
-	}, {
-		Text = e("TextLabel", {
-			Size = UDim2.new(1, 0, 1, 0),
-			Text = text,
-			TextColor3 = theme.textColor,
-			Font = FONT,
-			BorderSizePixel = 0,
-			TextSize = TEXT_SIZE,
-			BackgroundColor3 = self.buttonState:map(function(state)
-				return theme.buttonColor[state]
-			end)
+		-- TODO: make me modal
+		return e(Button, {
+			size = size,
+			position = position,
+			layoutOrder = layoutOrder,
+			buttonStateChanged = self.updateButtonState,
+			mouse1Clicked = mouse1Clicked,
+			mouse1Pressed = mouse1Pressed,
+		}, {
+			Text = e("TextLabel", {
+				Size = UDim2.new(1, 0, 1, 0),
+				Text = text,
+				TextColor3 = self.buttonState:map(function(state)
+					return colors.ButtonText[state]
+				end),
+				Font = FONT,
+				BorderSizePixel = 0,
+				TextSize = TEXT_SIZE,
+				BackgroundColor3 = self.buttonState:map(function(state)
+					return colors.Button[state]
+				end)
+			})
 		})
-	})
+	end)
 end
 
 return TextButton

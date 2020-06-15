@@ -3,6 +3,7 @@ local load = require(PluginRoot.Loader).load
 
 local Roact = load("Roact")
 local TextButton = load("Framework/TextButton")
+local StoryWrapper = load("Stories/StoryWrapper")
 
 local e = Roact.createElement
 
@@ -17,7 +18,7 @@ return function(target)
 		position = UDim2.new(0, 100, 0, 100),
 		text = "Test Button",
 	})
-	local handle = Roact.mount(button, target)
+	local handle = Roact.mount(StoryWrapper(button), target)
 
 	return function()
 		Roact.unmount(handle)

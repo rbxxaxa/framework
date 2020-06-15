@@ -3,6 +3,7 @@ local load = require(PluginRoot.Loader).load
 
 local Roact = load("Roact")
 local ScrollingVerticalList = load("Framework/ScrollingVerticalList")
+local StoryWrapper = load("Stories/StoryWrapper")
 
 local e = Roact.createElement
 
@@ -40,7 +41,8 @@ return function(target)
 			LayoutOrder = 2,
 		}),
 	})
-	local handle = Roact.mount(section, target)
+
+	local handle = Roact.mount(StoryWrapper(section), target)
 
 	return function()
 		Roact.unmount(handle)

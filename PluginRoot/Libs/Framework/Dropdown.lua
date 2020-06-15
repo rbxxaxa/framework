@@ -5,6 +5,7 @@ local Roact = load("Roact")
 local t = load("t")
 local Button = load("Framework/Button")
 local ScrollingVerticalList = load("Framework/ScrollingVerticalList")
+local ShadowedFrame = load("Framework/ShadowedFrame")
 local ThemeContext = load("Framework/ThemeContext")
 
 local e = Roact.createElement
@@ -168,19 +169,24 @@ function Dropdown:render()
 			end
 		end
 
-		children.EntriesScrollingFrame = self.state.open and e(ScrollingVerticalList, {
+		children.EntriesScrollingFrame = self.state.open and e(ShadowedFrame, {
 			position = UDim2.new(0, 0, 1, 4),
 			size = UDim2.new(1, 0, math.min(maxRows, numberOfChoices), 0),
-			paddingTop = 0,
-			paddingRight = 0,
-			paddingBottom = 0,
-			paddingLeft = 0,
-			paddingList = 0,
-			contentBackgroundColor = theme.choicesBackground,
-			CanvasPosition = self.canvasOffset:map(function(offset)
-				return Vector2.new(0, offset)
-			end),
-		}, scrollingFrameChildren)
+		}, {
+			e(ScrollingVerticalList, {
+				size = UDim2.new(1, 0, 1, 0),
+				paddingTop = 0,
+				paddingRight = 0,
+				paddingBottom = 0,
+				paddingLeft = 0,
+				paddingList = 0,
+				contentBackgroundColor = theme.choicesBackground,
+				CanvasPosition = self.canvasOffset:map(function(offset)
+					return Vector2.new(0, offset)
+				end),
+			}, scrollingFrameChildren)
+		})
+
 
 		-- TODO: make me modal
 		-- TODO: close when clicking out of the dropdown

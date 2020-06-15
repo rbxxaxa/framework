@@ -30,9 +30,18 @@ Button.validateProps = function(props)
 	return IButton(props)
 end
 
+local function isMouseInside(frame, mousePos)
+	local topLeft = frame.AbsolutePosition
+	local bottomRight = frame.AbsolutePosition + frame.AbsoluteSize - Vector2.new(1, 1)
+	local x, y = mousePos.X, mousePos.Y
+	return x >= topLeft.X and y >= topLeft.Y and x <= bottomRight.X and y <= bottomRight.Y
+end
+
 function Button:init()
 	self.activated = false
 	self.mouseInside = false
+
+	self.lastMousePos = Vector2.new(0, 0)
 end
 
 function Button:render()
@@ -50,32 +59,19 @@ function Button:render()
 		BackgroundTransparency = 1,
 		AutoButtonColor = false,
 		[Roact.Event.InputChanged] = function(rbx, inputObject)
-			local mousePos = inputObject.Position
-			local topLeft = rbx.AbsolutePosition
-			local bottomRight = rbx.AbsolutePosition + rbx.AbsoluteSize - Vector2.new(1, 1)
-			if mousePos.X >= topLeft.X and mousePos.Y >= topLeft.Y
-				and mousePos.X <= bottomRight.X and mousePos.Y <= bottomRight.Y then
-
-				self.mouseInside = true
-				self:refreshButtonState()
-			else
-				self.mouseInside = false
-				self:refreshButtonState()
-			end
+			self:updateMouseInside(rbx, inputObject.Position)
 		end,
 		[Roact.Event.MouseEnter] = function(rbx, x, y)
-			local topLeft = rbx.AbsolutePosition
-			local bottomRight = rbx.AbsolutePosition + rbx.AbsoluteSize - Vector2.new(1, 1)
-			if x >= topLeft.X and y >= topLeft.Y
-				and x <= bottomRight.X and y <= bottomRight.Y then
-
-				self.mouseInside = true
-				self:refreshButtonState()
-			end
+			local mousePos = Vector2.new(x, y)
+			self:updateMouseInside(rbx, mousePos)
 		end,
-		[Roact.Event.MouseLeave] = function()
-			self.mouseInside = false
-			self:refreshButtonState()
+		[Roact.Event.MouseMoved] = function(rbx, x, y)
+			local mousePos = Vector2.new(x, y)
+			self:updateMouseInside(rbx, mousePos)
+		end,
+		[Roact.Event.MouseLeave] = function(rbx, x, y)
+			local mousePos = Vector2.new(x, y)
+			self:updateMouseInside(rbx, mousePos)
 		end,
 		[Roact.Event.InputBegan] = function(rbx, inputObject)
 			if not self.mouseInside then return end
@@ -98,6 +94,14 @@ function Button:render()
 			end
 		end
 	}, props[Roact.Children])
+end
+
+function Button:updateMouseInside(frame, mousePos)
+	local mouseInside = isMouseInside(frame, mousePos)
+	if mouseInside ~= self.mouseInside then
+		self.mouseInside = mouseInside
+		self:refreshButtonState()
+	end
 end
 
 function Button:refreshButtonState()

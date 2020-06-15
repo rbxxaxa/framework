@@ -170,7 +170,7 @@ function Dropdown:render()
 		end
 
 		children.EntriesScrollingFrame = self.state.open and e(ShadowedFrame, {
-			position = UDim2.new(0, 0, 1, 4),
+			position = UDim2.new(0, 0, 1, 2),
 			size = UDim2.new(1, 0, math.min(maxRows, numberOfChoices), 0),
 		}, {
 			e(ScrollingVerticalList, {

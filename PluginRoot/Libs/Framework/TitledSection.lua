@@ -11,7 +11,7 @@ local e = Roact.createElement
 -- TODO: Use a constants module for this.
 local HEADER_HEIGHT = 32
 local BOLD_FONT = Enum.Font.SourceSansBold
-local TITLE_TEXT_SIZE = 16
+local TITLE_TEXT_SIZE = 18
 
 local TitledSection = Roact.PureComponent:extend("TitledSection")
 

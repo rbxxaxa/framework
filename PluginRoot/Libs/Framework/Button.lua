@@ -48,6 +48,7 @@ function Button:render()
 	local props = self.props
 	local size = props.size
 	local position = props.position
+	local layoutOrder = props.layoutOrder
 	local mouse1Clicked = props.mouse1Clicked
 	local mouse1Pressed = props.mouse1Pressed
 
@@ -55,6 +56,7 @@ function Button:render()
 	return e("TextButton", {
 		Size = size,
 		Position = position,
+		LayoutOrder = layoutOrder,
 		Text = "",
 		BackgroundTransparency = 1,
 		AutoButtonColor = false,

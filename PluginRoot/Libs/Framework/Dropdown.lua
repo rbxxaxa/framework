@@ -100,7 +100,6 @@ function Dropdown:render()
 	return ThemeContext.withConsumer(function(theme)
 		local colors = theme.colors
 
-		-- TODO: render an arrow
 		local children = {}
 		children.DisplayBacker = e("Frame", {
 			Size = UDim2.new(1, 0, 1, 0),

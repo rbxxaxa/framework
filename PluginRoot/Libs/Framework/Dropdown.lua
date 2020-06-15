@@ -67,9 +67,15 @@ function Dropdown:init()
 	self.canvasOffset, self.updateCanvasOffset = Roact.createBinding(0)
 	self.hoveredIndex, self.updateHoveredIndex = Roact.createBinding(0)
 	self.onDropdownButtonPressed = function()
-		self:setState({
-			open = true,
-		})
+		if not self.state.open then
+			self:setState({
+				open = true,
+			})
+		else
+			self:setState({
+				open = false,
+			})
+		end
 	end
 	self.buttonState, self.updateButtonState = Roact.createBinding("Default")
 end

@@ -7,6 +7,7 @@ local Button = load("Framework/Button")
 local ScrollingVerticalList = load("Framework/ScrollingVerticalList")
 local ShadowedFrame = load("Framework/ShadowedFrame")
 local ThemeContext = load("Framework/ThemeContext")
+local ModalTargetContext = load("Framework/ModalTargetContext")
 
 local e = Roact.createElement
 
@@ -64,7 +65,8 @@ function Dropdown:init()
 		open = false,
 	}
 
-	self.choiceHeight, self.updateChoiceHeight = Roact.createBinding(self.props.size.Y.Offset)
+	self.buttonAbsoluteSize, self.updateButtonAbsoluteSize = Roact.createBinding(Vector2.new())
+	self.buttonAbsolutePosition, self.updateButtonAbsolutePosition = Roact.createBinding(Vector2.new())
 	self.canvasOffset, self.updateCanvasOffset = Roact.createBinding(0)
 	self.hoveredIndex, self.updateHoveredIndex = Roact.createBinding(0)
 	self.onDropdownButtonPressed = function()
@@ -124,7 +126,7 @@ function Dropdown:render()
 				scrollingFrameChildren[choiceIndex] = e("Frame", {
 					BackgroundTransparency = 0,
 					BorderSizePixel = 0,
-					Size = self.choiceHeight:map(function(height) return UDim2.new(1, 0, 0, height) end),
+					Size = self.buttonAbsoluteSize:map(function(absoluteSize) return UDim2.new(1, 0, 0, absoluteSize.Y) end),
 					LayoutOrder = choiceIndex,
 					BackgroundColor3 = self.hoveredIndex:map(function(idx)
 						if choiceIndex == idx then
@@ -143,10 +145,6 @@ function Dropdown:render()
 							self:setState({
 								open = false
 							})
-							self.updateHoveredIndex(0)
-							if hoveredIndexChanged then
-								hoveredIndexChanged(0)
-							end
 							self.updateCanvasOffset(0)
 						end,
 						buttonStateChanged = function(buttonState)
@@ -169,37 +167,75 @@ function Dropdown:render()
 			end
 		end
 
-		children.EntriesScrollingFrame = self.state.open and e(ShadowedFrame, {
-			position = UDim2.new(0, 0, 1, 2),
-			size = UDim2.new(1, 0, math.min(maxRows, numberOfChoices), 0),
-		}, {
-			e(ScrollingVerticalList, {
-				size = UDim2.new(1, 0, 1, 0),
-				paddingTop = 0,
-				paddingRight = 0,
-				paddingBottom = 0,
-				paddingLeft = 0,
-				paddingList = 0,
-				contentBackgroundColor = theme.choicesBackground,
-				CanvasPosition = self.canvasOffset:map(function(offset)
-					return Vector2.new(0, offset)
-				end),
-			}, scrollingFrameChildren)
-		})
+		children.DropdownEntries = self.state.open and ModalTargetContext.withConsumer(function(modalTarget)
+			return e(Roact.Portal, {
+				target = modalTarget.target,
+			}, {
+				e("TextButton", {
+					Size = UDim2.new(1, 0, 1, 0),
+					Text = "",
+					BackgroundTransparency = 1,
+					[Roact.Event.MouseButton1Down] = function()
+						self:setState({
+							open = false,
+						})
+					end,
+				}),
+
+				e("Frame", {
+					Size = self.buttonAbsoluteSize:map(function(absoluteSize)
+						return UDim2.new(0, absoluteSize.X, 0, absoluteSize.Y * math.min(maxRows, numberOfChoices))
+					end),
+					Position = Roact.joinBindings({self.buttonAbsoluteSize, self.buttonAbsolutePosition}):map(function(joined)
+						local absoluteSize, absolutePosition = joined[1], joined[2]
+						local x = absolutePosition.X - modalTarget.target.AbsolutePosition.X
+						local y = absolutePosition.Y + absoluteSize.Y - modalTarget.target.AbsolutePosition.Y + 3
+						return UDim2.new(0, x, 0, y)
+					end),
+					BackgroundTransparency = 1,
+					ZIndex = 2,
+				}, {
+					e(ShadowedFrame, {
+						position = UDim2.new(0, 0, 0, 0),
+						size = UDim2.new(1, 0, 1, 0),
+					}, {
+						e(ScrollingVerticalList, {
+							size = UDim2.new(1, 0, 1, 0),
+							paddingTop = 0,
+							paddingRight = 0,
+							paddingBottom = 0,
+							paddingLeft = 0,
+							paddingList = 0,
+							contentBackgroundColor = theme.choicesBackground,
+							CanvasPosition = self.canvasOffset:map(function(offset)
+								return Vector2.new(0, offset)
+							end),
+						}, scrollingFrameChildren)
+					})
+				})
+			})
+		end)
 
 
 		-- TODO: make me modal
-		-- TODO: close when clicking out of the dropdown
-		return e(Button, {
-			size = size,
-			position = position,
-			layoutOrder = layoutOrder,
-			mouse1Pressed = self.onDropdownButtonPressed,
+		return e("Frame", {
+			Size = size,
+			Position = position,
+			LayoutOrder = layoutOrder,
 			[Roact.Change.AbsoluteSize] = function(rbx)
-				self.updateChoiceHeight(rbx.AbsoluteSize.Y)
+				self.updateButtonAbsoluteSize(rbx.AbsoluteSize)
 			end,
-			buttonStateChanged = self.updateButtonState,
-		}, children)
+			[Roact.Change.AbsolutePosition] = function(rbx)
+				self.updateButtonAbsolutePosition(rbx.AbsolutePosition)
+			end,
+			BackgroundTransparency = 1,
+		}, {
+			e(Button, {
+				size = UDim2.new(1, 0, 1, 0),
+				mouse1Pressed = self.onDropdownButtonPressed,
+				buttonStateChanged = self.updateButtonState,
+			}, children)
+		})
 	end)
 end
 

@@ -105,7 +105,7 @@ return function(target)
 		})
 	end
 
-	local handle = Roact.mount(StoryWrapper(e(BasicEditor)), target)
+	local handle = Roact.mount(StoryWrapper({ modalTarget = target }, e(BasicEditor)), target)
 
 	return function()
 		Roact.unmount(handle)

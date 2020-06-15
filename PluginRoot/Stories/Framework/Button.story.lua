@@ -45,7 +45,7 @@ return function(target)
 			ZIndex = 2,
 		}),
 	})
-	local handle = Roact.mount(StoryWrapper(button), target)
+	local handle = Roact.mount(StoryWrapper({ modalTarget = target }, button), target)
 
 	return function()
 		Roact.unmount(handle)

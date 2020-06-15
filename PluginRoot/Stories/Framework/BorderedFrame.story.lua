@@ -47,7 +47,7 @@ return function(target)
 			TextColor3 = Color3.new(1, 1, 1),
 		}),
 	})
-	local roundHandle = Roact.mount(StoryWrapper(roundFrame), target)
+	local roundHandle = Roact.mount(StoryWrapper({ modalTarget = target }, roundFrame), target)
 
 	return function()
 		Roact.unmount(squareHandle)

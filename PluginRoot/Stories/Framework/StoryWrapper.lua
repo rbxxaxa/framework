@@ -3,11 +3,17 @@ local load = require(PluginRoot.Loader).load
 
 local Theme = load("Framework/Theme")
 local ThemeContext = load("Framework/ThemeContext")
+local ModalTargetContext = load("Framework/ModalTargetContext")
 
-return function(children)
-	local theme = Theme.new()
+return function(props, children)
+	local theme = props.theme or Theme.new()
+	local modalTarget = props.modalTarget
 
 	return ThemeContext.withController({
-		theme = theme
-	}, children)
+		theme = theme,
+	}, {
+		ModalTargetContext.withController({
+			modalTarget = modalTarget,
+		}, children)
+	})
 end

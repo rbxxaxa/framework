@@ -42,7 +42,7 @@ return function(target)
 			LayoutOrder = 2,
 		}),
 	})
-	local handle = Roact.mount(StoryWrapper(section), target)
+	local handle = Roact.mount(StoryWrapper({ modalTarget = target }, section), target)
 
 	return function()
 		Roact.unmount(handle)

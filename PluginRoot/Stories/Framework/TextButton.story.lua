@@ -18,7 +18,7 @@ return function(target)
 		position = UDim2.new(0, 100, 0, 100),
 		text = "Test Button",
 	})
-	local handle = Roact.mount(StoryWrapper(button), target)
+	local handle = Roact.mount(StoryWrapper({ modalTarget = target }, button), target)
 
 	return function()
 		Roact.unmount(handle)

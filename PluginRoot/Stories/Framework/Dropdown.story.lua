@@ -59,7 +59,7 @@ return function(target)
 	end
 
 
-	local handle = Roact.mount(StoryWrapper(e(DropdownStory)), target)
+	local handle = Roact.mount(StoryWrapper({ modalTarget = target }, e(DropdownStory)), target)
 
 	return function()
 		Roact.unmount(handle)

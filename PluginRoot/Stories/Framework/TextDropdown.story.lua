@@ -33,7 +33,7 @@ return function(target)
 
 		local dropdown = e(TextDropdown, {
 			position = UDim2.new(0, 20, 0, 20),
-			size = UDim2.new(0, 100, 0, 24),
+			size = UDim2.new(0, 200, 0, 24),
 			choiceDatas = choiceDatas,
 			choiceTexts = choiceTexts,
 			choiceSelected = function(idx, data)

@@ -5,6 +5,7 @@ local Roact = load("Roact")
 local t = load("t")
 local Button = load("Framework/Button")
 local ScrollingVerticalList = load("Framework/ScrollingVerticalList")
+local ThemeContext = load("Framework/ThemeContext")
 
 local e = Roact.createElement
 
@@ -64,12 +65,13 @@ function Dropdown:init()
 
 	self.choiceHeight, self.updateChoiceHeight = Roact.createBinding(self.props.size.Y.Offset)
 	self.canvasOffset, self.updateCanvasOffset = Roact.createBinding(0)
-	self.hoveredIndex = 0
+	self.hoveredIndex, self.updateHoveredIndex = Roact.createBinding(0)
 	self.onDropdownButtonPressed = function()
 		self:setState({
 			open = true,
 		})
 	end
+	self.buttonState, self.updateButtonState = Roact.createBinding("Default")
 end
 
 function Dropdown:render()
@@ -86,94 +88,107 @@ function Dropdown:render()
 
 	local numberOfChoices = choiceDatas and #choiceDatas or 0
 
-	-- TODO: theme me
-	local theme = {
-		choicesBackground = Color3.new(0, 0, 0),
-		buttonBackground = Color3.new(0, 0, 0),
-		arrow = Color3.new(1, 1, 1),
-	}
+	return ThemeContext.withConsumer(function(theme)
+		local colors = theme.colors
 
-	-- TODO: render an arrow
-	-- TODO: highlight when mousing over + other button state changes
-	local children = {}
-	children.DisplayBacker = e("Frame", {
-		Size = UDim2.new(1, 0, 1, 0),
-		BackgroundColor3 = theme.buttonBackground,
-		BorderSizePixel = 0,
-	}, {
-		Display = buttonDisplay,
-	})
+		-- TODO: render an arrow
+		local children = {}
+		children.DisplayBacker = e("Frame", {
+			Size = UDim2.new(1, 0, 1, 0),
+			BackgroundColor3 = self.buttonState:map(function(bs)
+				if self.state.open then
+					return colors.InputFieldBackground.Focused
+				elseif bs == "Hovered" then
+					return colors.InputFieldBackground.Hovered
+				else
+					return colors.InputFieldBackground.Default
+				end
+			end),
+			BorderSizePixel = 0,
+		}, {
+			Display = buttonDisplay,
+		})
 
-	local scrollingFrameChildren = {}
-	if numberOfChoices > 0 then
-		for choiceIndex = 1, numberOfChoices do
-			local choiceDisplay = choiceDisplays[choiceIndex]
-			local choiceData = choiceDatas[choiceIndex]
-			scrollingFrameChildren[choiceIndex] = e("Frame", {
-				BackgroundTransparency = 1,
-				Size = self.choiceHeight:map(function(height) return UDim2.new(1, 0, 0, height) end),
-				LayoutOrder = choiceIndex,
-			}, {
-				ChoiceButton = e(Button, {
-					size = UDim2.new(1, 0, 1, 0),
-					mouse1Pressed = function()
-						if choiceSelected then
-							choiceSelected(choiceIndex, choiceData)
+		local scrollingFrameChildren = {}
+		if numberOfChoices > 0 then
+			for choiceIndex = 1, numberOfChoices do
+				local choiceDisplay = choiceDisplays[choiceIndex]
+				local choiceData = choiceDatas[choiceIndex]
+				scrollingFrameChildren[choiceIndex] = e("Frame", {
+					BackgroundTransparency = 0,
+					BorderSizePixel = 0,
+					Size = self.choiceHeight:map(function(height) return UDim2.new(1, 0, 0, height) end),
+					LayoutOrder = choiceIndex,
+					BackgroundColor3 = self.hoveredIndex:map(function(idx)
+						if choiceIndex == idx then
+							return colors.DropdownChoiceBackground.Hovered
+						else
+							return colors.DropdownChoiceBackground.Default
 						end
-						self:setState({
-							open = false
-						})
-						self.hoveredIndex = 0
-						if hoveredIndexChanged then
-							hoveredIndexChanged(0)
-						end
-						self.updateCanvasOffset(0)
-					end,
-					buttonStateChanged = function(buttonState)
-						if buttonState == "Hovered" then
-							self.hoveredIndex = choiceIndex
-							if hoveredIndexChanged then
-								hoveredIndexChanged(choiceIndex)
+					end)
+				}, {
+					ChoiceButton = e(Button, {
+						size = UDim2.new(1, 0, 1, 0),
+						mouse1Pressed = function()
+							if choiceSelected then
+								choiceSelected(choiceIndex, choiceData)
 							end
-						elseif self.hoveredIndex == choiceIndex then
-							self.hoveredIndex = 0
+							self:setState({
+								open = false
+							})
+							self.updateHoveredIndex(0)
 							if hoveredIndexChanged then
 								hoveredIndexChanged(0)
 							end
-						end
-					end,
-				}, {
-					choiceDisplay,
+							self.updateCanvasOffset(0)
+						end,
+						buttonStateChanged = function(buttonState)
+							if buttonState == "Hovered" then
+								self.updateHoveredIndex(choiceIndex)
+								if hoveredIndexChanged then
+									hoveredIndexChanged(choiceIndex)
+								end
+							elseif self.hoveredIndex:getValue() == choiceIndex then
+								self.updateHoveredIndex(0)
+								if hoveredIndexChanged then
+									hoveredIndexChanged(0)
+								end
+							end
+						end,
+					}, {
+						choiceDisplay,
+					})
 				})
-			})
+			end
 		end
-	end
 
-	children.EntriesScrollingFrame = self.state.open and e(ScrollingVerticalList, {
-		position = UDim2.new(0, 0, 1, 4),
-		size = UDim2.new(1, 0, math.min(maxRows, numberOfChoices), 0),
-		paddingTop = 0,
-		paddingRight = 0,
-		paddingBottom = 0,
-		paddingLeft = 0,
-		paddingList = 0,
-		contentBackgroundColor = theme.choicesBackground,
-		CanvasPosition = self.canvasOffset:map(function(offset)
-			return Vector2.new(0, offset)
-		end),
-	}, scrollingFrameChildren)
+		children.EntriesScrollingFrame = self.state.open and e(ScrollingVerticalList, {
+			position = UDim2.new(0, 0, 1, 4),
+			size = UDim2.new(1, 0, math.min(maxRows, numberOfChoices), 0),
+			paddingTop = 0,
+			paddingRight = 0,
+			paddingBottom = 0,
+			paddingLeft = 0,
+			paddingList = 0,
+			contentBackgroundColor = theme.choicesBackground,
+			CanvasPosition = self.canvasOffset:map(function(offset)
+				return Vector2.new(0, offset)
+			end),
+		}, scrollingFrameChildren)
 
-	-- TODO: make me modal
-	-- TODO: close when clicking out of the dropdown
-	return e(Button, {
-		size = size,
-		position = position,
-		layoutOrder = layoutOrder,
-		mouse1Pressed = self.onDropdownButtonPressed,
-		[Roact.Change.AbsoluteSize] = function(rbx)
-			self.updateChoiceHeight(rbx.AbsoluteSize.Y)
-		end,
-	}, children)
+		-- TODO: make me modal
+		-- TODO: close when clicking out of the dropdown
+		return e(Button, {
+			size = size,
+			position = position,
+			layoutOrder = layoutOrder,
+			mouse1Pressed = self.onDropdownButtonPressed,
+			[Roact.Change.AbsoluteSize] = function(rbx)
+				self.updateChoiceHeight(rbx.AbsoluteSize.Y)
+			end,
+			buttonStateChanged = self.updateButtonState,
+		}, children)
+	end)
 end
 
 return Dropdown

@@ -41,7 +41,20 @@ function Theme.new()
 		},
 		TitledSectionContentBackground = {
 			Default = c(46, 46, 46),
-		}
+		},
+		DropdownChoiceBackground = {
+			Default = c(46, 46, 46),
+			Hovered = c(66, 66, 66),
+		},
+		DropdownChoiceText = {
+			Default = c(204, 204, 204),
+			Hovered = c(204, 204, 204),
+		},
+		InputFieldBackground = {
+			Default = c(37, 37, 37),
+			Hovered = c(66, 66, 66),
+			Focused = c(37, 37, 37),
+		},
 	}
 
 	return setmetatable(self, Theme)

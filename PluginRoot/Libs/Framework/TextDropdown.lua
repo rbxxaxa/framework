@@ -4,6 +4,7 @@ local load = require(PluginRoot.Loader).load
 local Roact = load("Roact")
 local t = load("t")
 local Dropdown = load("Framework/Dropdown")
+local ThemeContext = load("Framework/ThemeContext")
 
 local e = Roact.createElement
 
@@ -58,15 +59,17 @@ function TextDropdown:init()
 	self.hoveredIndex, self.updateHoveredIndex = Roact.createBinding(0)
 end
 
--- TODO: Theme me
--- PS: hoveredIndexBinding may turn out to be unecessary
 local function createTextChoiceDisplay(theme, text, index, hoveredIndexBinding)
+	local colors = theme.colors
+
 	return e("TextLabel", {
-		Size = UDim2.new(1, 0, 1, 0),
+		Size = UDim2.new(1, -16, 1, 0),
+		Position = UDim2.new(0, 8, 0, 0),
 		Text = text,
+		TextXAlignment = Enum.TextXAlignment.Left,
 		BackgroundTransparency = 1,
 		TextColor3 = hoveredIndexBinding:map(function(hoveredIndex)
-			return index == hoveredIndex and Color3.new(1, 0, 0) or Color3.new(0, 1, 0)
+			return index == hoveredIndex and colors.DropdownChoiceText.Hovered or colors.DropdownChoiceText.Default
 		end),
 	})
 end
@@ -82,35 +85,36 @@ function TextDropdown:render()
 	local choiceDatas = props.choiceDatas
 	local choiceTexts = props.choiceTexts
 
-	-- TODO: Theme me
-	local theme = {}
-
-	local choiceDisplays = nil
-	if choiceDatas then
-		choiceDisplays = {}
-		for choiceIndex, choiceText in ipairs(choiceTexts) do
-			choiceDisplays[choiceIndex] = createTextChoiceDisplay(theme, choiceText, choiceIndex, self.hoveredIndex)
+	return ThemeContext.withConsumer(function(theme)
+		local choiceDisplays = nil
+		if choiceDatas then
+			choiceDisplays = {}
+			for choiceIndex, choiceText in ipairs(choiceTexts) do
+				choiceDisplays[choiceIndex] = createTextChoiceDisplay(theme, choiceText, choiceIndex, self.hoveredIndex)
+			end
 		end
-	end
 
-	local buttonDisplay = e("TextLabel", {
-		Size = UDim2.new(1, 0, 1, 0),
-		Text = buttonText,
-		BackgroundTransparency = 1,
-		TextColor3 = Color3.new(1, 1, 1),
-	})
+		local buttonDisplay = e("TextLabel", {
+			Size = UDim2.new(1, -16, 1, 0),
+			Position = UDim2.new(0, 8, 0, 0),
+			Text = buttonText,
+			TextXAlignment = Enum.TextXAlignment.Left,
+			BackgroundTransparency = 1,
+			TextColor3 = Color3.new(1, 1, 1),
+		})
 
-	return e(Dropdown, {
-		size = size,
-		position = position,
-		layoutOrder = layoutOrder,
-		maxRows = maxRows,
-		buttonDisplay = buttonDisplay,
-		choiceSelected = choiceSelected,
-		hoveredIndexChanged = self.updateHoveredIndex,
-		choiceDatas = choiceDatas,
-		choiceDisplays = choiceDisplays,
-	})
+		return e(Dropdown, {
+			size = size,
+			position = position,
+			layoutOrder = layoutOrder,
+			maxRows = maxRows,
+			buttonDisplay = buttonDisplay,
+			choiceSelected = choiceSelected,
+			hoveredIndexChanged = self.updateHoveredIndex,
+			choiceDatas = choiceDatas,
+			choiceDisplays = choiceDisplays,
+		})
+	end)
 end
 
 return TextDropdown

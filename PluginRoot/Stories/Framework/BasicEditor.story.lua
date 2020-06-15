@@ -65,10 +65,24 @@ return function(target)
 				}, (function()
 					local children = {}
 
-					for i = 1, 10 do
+					for i = 1, 5 do
 						children[i] = e(TextButton, {
 							size = UDim2.new(1, 0, 0, 24),
 							text = "Button " .. i,
+							layoutOrder = i,
+						})
+					end
+
+					for i = 6, 10 do
+						children[i] = e(TextDropdown, {
+							size = UDim2.new(1, 0, 0, 24),
+							choiceDatas = {
+								"A", "B", "C", "D", "E", "E",
+							},
+							choiceTexts = {
+								"A", "B", "C", "D", "E", "E",
+							},
+							buttonText = "Select a choice.",
 							layoutOrder = i,
 						})
 					end

@@ -109,9 +109,9 @@ function ScrollingVerticalList:render()
 				CanvasSize = self.contentHeight:map(function(height)
 					return UDim2.new(1, 0, 0, height + paddingTop + paddingBottom)
 				end),
-				TopImage = "rbxassetid://5184406267",
-				BottomImage = "rbxassetid://5184406117",
-				MidImage = "rbxassetid://5184406223",
+				TopImage = "rbxassetid://2245002518",
+				BottomImage = "rbxassetid://2245002518",
+				MidImage = "rbxassetid://2245002518",
 				ScrollBarImageColor3 = colors.ScrollBar.Default,
 			}, children)
 		})

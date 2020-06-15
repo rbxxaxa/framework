@@ -74,6 +74,8 @@ function Button:render()
 			self:updateMouseInside(rbx, mousePos)
 		end,
 		[Roact.Event.InputBegan] = function(rbx, inputObject)
+			self:updateMouseInside(rbx, inputObject.Position)
+
 			if not self.mouseInside then return end
 
 			if inputObject.UserInputType == Enum.UserInputType.MouseButton1 then
@@ -85,6 +87,8 @@ function Button:render()
 			end
 		end,
 		[Roact.Event.InputEnded] = function(rbx, inputObject)
+			self:updateMouseInside(rbx, inputObject.Position)
+
 			if inputObject.UserInputType == Enum.UserInputType.MouseButton1 then
 				self.activated = false
 				self:refreshButtonState()

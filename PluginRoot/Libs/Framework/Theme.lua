@@ -11,9 +11,9 @@ function Theme.new()
 	self.colors = {
 		Button = {
 			Default = c(60, 60, 60),
-			Hovered = c(66, 66, 66),
-			PressedIn = c(41, 41, 41),
-			PressedOut = c(66, 66, 66),
+			Hovered = c(70, 70, 70),
+			PressedIn = c(50, 50, 50),
+			PressedOut = c(70, 70, 70),
 		},
 		ButtonText = {
 			Default = c(204, 204, 204),
@@ -28,32 +28,32 @@ function Theme.new()
 			PressedOut = c(255, 255, 255),
 		},
 		ScrollBar = {
-			Default = c(56, 56, 56),
+			Default = c(80, 80, 80),
 		},
 		ScrollBarBackground = {
-			Default = c(41, 41, 41),
+			Default = c(60, 60, 60),
 		},
 		ScrollingFrameContentBackground = {
-			Default = c(46, 46, 46),
+			Default = c(40, 40, 40),
 		},
 		TitledSectionTitleBackground = {
-			Default = c(53, 53, 53),
+			Default = c(20, 20, 20),
 		},
 		TitledSectionContentBackground = {
-			Default = c(46, 46, 46),
+			Default = c(30, 30, 30),
 		},
 		DropdownChoiceBackground = {
-			Default = c(46, 46, 46),
-			Hovered = c(66, 66, 66),
+			Default = c(40, 40, 40),
+			Hovered = c(50, 50, 50),
 		},
 		DropdownChoiceText = {
 			Default = c(204, 204, 204),
 			Hovered = c(204, 204, 204),
 		},
 		InputFieldBackground = {
-			Default = c(37, 37, 37),
-			Hovered = c(66, 66, 66),
-			Focused = c(37, 37, 37),
+			Default = c(50, 50, 50),
+			Hovered = c(60, 60, 60),
+			Focused = c(50, 50, 50),
 		},
 	}
 

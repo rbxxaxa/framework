@@ -18,6 +18,7 @@ TextButton.defaultProps = {
 	text = "Default Text",
 	mouse1Clicked = nil,
 	mouse1Pressed = nil,
+	disabled = false,
 }
 
 local ITextButton = t.interface({
@@ -27,6 +28,7 @@ local ITextButton = t.interface({
 	text = t.string,
 	mouse1Clicked = t.optional(t.callback),
 	mouse1Pressed = t.optional(t.callback),
+	disabled = t.boolean,
 })
 
 TextButton.validateProps = function(props)
@@ -45,6 +47,7 @@ function TextButton:render()
 	local text = props.text
 	local mouse1Clicked = props.mouse1Clicked
 	local mouse1Pressed = props.mouse1Pressed
+	local disabled = props.disabled
 
 	return ThemeContext.withConsumer(function(theme)
 		local colors = theme.colors
@@ -57,18 +60,27 @@ function TextButton:render()
 			buttonStateChanged = self.updateButtonState,
 			mouse1Clicked = mouse1Clicked,
 			mouse1Pressed = mouse1Pressed,
+			disabled = disabled,
 		}, {
 			Text = e("TextLabel", {
 				Size = UDim2.new(1, 0, 1, 0),
 				Text = text,
 				TextColor3 = self.buttonState:map(function(state)
-					return colors.ButtonText[state]
+					if disabled then
+						return colors.ButtonText.Disabled
+					else
+						return colors.ButtonText[state]
+					end
 				end),
 				Font = Constants.FONT_DEFAULT,
 				BorderSizePixel = 0,
 				TextSize = Constants.FONT_SIZE_DEFAULT,
 				BackgroundColor3 = self.buttonState:map(function(state)
-					return colors.Button[state]
+					if disabled then
+						return colors.Button.Disabled
+					else
+						return colors.Button[state]
+					end
 				end)
 			})
 		})
@@ -76,4 +88,3 @@ function TextButton:render()
 end
 
 return TextButton
-

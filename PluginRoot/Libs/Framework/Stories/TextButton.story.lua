@@ -13,12 +13,24 @@ return function(target)
 		propValidation = true,
 	})
 
-	local button  = e(TextButton, {
+	local button = e(TextButton, {
 		size = UDim2.new(0, 100, 0, 100),
 		position = UDim2.new(0, 100, 0, 100),
 		text = "Test Button",
 	})
-	local handle = Roact.mount(StoryWrapper({ modalTarget = target }, button), target)
+
+	local disabledButton = e(TextButton, {
+		size = UDim2.new(0, 100, 0, 100),
+		position = UDim2.new(0, 220, 0, 100),
+		text = "Test Button (Disabled)",
+		disabled = true,
+	})
+
+	local fragment = Roact.createFragment({
+		button, disabledButton,
+	})
+
+	local handle = Roact.mount(StoryWrapper({ modalTarget = target }, fragment), target)
 
 	return function()
 		Roact.unmount(handle)

@@ -15,6 +15,7 @@ Button.defaultProps = {
 	buttonStateChanged = nil,
 	mouse1Clicked = nil,
 	mouse1Pressed = nil,
+	disabled = false,
 }
 
 local IButton = t.interface({
@@ -24,6 +25,7 @@ local IButton = t.interface({
 	buttonStateChanged = t.optional(t.callback),
 	mouse1Clicked = t.optional(t.callback),
 	mouse1Pressed = t.optional(t.callback),
+	disabled = t.boolean,
 })
 
 Button.validateProps = function(props)
@@ -51,6 +53,7 @@ function Button:render()
 	local layoutOrder = props.layoutOrder
 	local mouse1Clicked = props.mouse1Clicked
 	local mouse1Pressed = props.mouse1Pressed
+	local disabled = props.disabled
 
 	-- TODO: make me modal
 	return e("TextButton", {
@@ -78,6 +81,7 @@ function Button:render()
 		[Roact.Event.InputBegan] = function(rbx, inputObject)
 			self:updateMouseInside(rbx, inputObject.Position)
 
+			if disabled then return end
 			if not self.mouseInside then return end
 
 			if inputObject.UserInputType == Enum.UserInputType.MouseButton1 then
@@ -91,6 +95,8 @@ function Button:render()
 		[Roact.Event.InputEnded] = function(rbx, inputObject)
 			self:updateMouseInside(rbx, inputObject.Position)
 
+			if disabled then return end
+
 			if inputObject.UserInputType == Enum.UserInputType.MouseButton1 then
 				self.activated = false
 				self:refreshButtonState()
@@ -100,6 +106,15 @@ function Button:render()
 			end
 		end
 	}, props[Roact.Children])
+end
+
+function Button:didUpdate(prevProps, pervState)
+	if prevProps.disabled ~= self.props.disabled then
+		if self.activated then
+			self.activated = false
+			self:refreshButtonState()
+		end
+	end
 end
 
 function Button:updateMouseInside(frame, mousePos)

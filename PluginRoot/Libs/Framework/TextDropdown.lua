@@ -96,7 +96,6 @@ function TextDropdown:render()
 			end
 		end
 
-		-- TODO: render an arrow
 		local buttonDisplay = e("TextLabel", {
 			Size = UDim2.new(1, -16, 1, 0),
 			Position = UDim2.new(0, 8, 0, 0),

@@ -14,12 +14,14 @@ function Theme.new()
 			Hovered = c(70, 70, 70),
 			PressedIn = c(50, 50, 50),
 			PressedOut = c(70, 70, 70),
+			Disabled = c(60, 60, 60),
 		},
 		ButtonText = {
 			Default = c(204, 204, 204),
 			Hovered = c(204, 204, 204),
 			PressedIn = c(204, 204, 204),
 			PressedOut = c(204, 204, 204),
+			Disabled = c(85, 85, 85),
 		},
 		MainText = {
 			Default = c(204, 204, 204),

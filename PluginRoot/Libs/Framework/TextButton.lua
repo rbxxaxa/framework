@@ -5,11 +5,9 @@ local Roact = load("Roact")
 local t = load("t")
 local Button = load("Framework/Button")
 local ThemeContext = load("Framework/ThemeContext")
+local Constants = load("Framework/Constants")
 
 local e = Roact.createElement
-
-local FONT = Enum.Font.SourceSans
-local TEXT_SIZE = 14
 
 local TextButton = Roact.Component:extend("TextButton")
 
@@ -66,9 +64,9 @@ function TextButton:render()
 				TextColor3 = self.buttonState:map(function(state)
 					return colors.ButtonText[state]
 				end),
-				Font = FONT,
+				Font = Constants.FONT_DEFAULT,
 				BorderSizePixel = 0,
-				TextSize = TEXT_SIZE,
+				TextSize = Constants.FONT_SIZE_DEFAULT,
 				BackgroundColor3 = self.buttonState:map(function(state)
 					return colors.Button[state]
 				end)

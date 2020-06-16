@@ -5,13 +5,11 @@ local Roact = load("Roact")
 local t = load("t")
 local Oyrc = load("Oyrc")
 local ThemeContext = load("Framework/ThemeContext")
+local Constants = load("Framework/Constants")
 
 local e = Roact.createElement
 
--- TODO: Use a constants module for this.
 local HEADER_HEIGHT = 32
-local BOLD_FONT = Enum.Font.SourceSansBold
-local TITLE_TEXT_SIZE = 18
 
 local TitledSection = Roact.PureComponent:extend("TitledSection")
 
@@ -83,8 +81,8 @@ function TitledSection:render()
 					Text = title,
 					Position = UDim2.new(0, 8, 0, 0),
 					Size = UDim2.new(1, 0, 0, HEADER_HEIGHT),
-					Font = BOLD_FONT,
-					TextSize = TITLE_TEXT_SIZE,
+					Font = Constants.FONT_BOLD,
+					TextSize = Constants.FONT_SIZE_EXTRA_LARGE,
 					TextXAlignment = Enum.TextXAlignment.Left,
 					TextColor3 = colors.MainText.Default,
 					TextTruncate = Enum.TextTruncate.AtEnd,

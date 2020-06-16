@@ -5,6 +5,7 @@ local Roact = load("Roact")
 local t = load("t")
 local Dropdown = load("Framework/Dropdown")
 local ThemeContext = load("Framework/ThemeContext")
+local Constants = load("Framework/Constants")
 
 local e = Roact.createElement
 
@@ -71,6 +72,7 @@ local function createTextChoiceDisplay(theme, text, index, hoveredIndexBinding)
 		TextColor3 = hoveredIndexBinding:map(function(hoveredIndex)
 			return index == hoveredIndex and colors.DropdownChoiceText.Hovered or colors.DropdownChoiceText.Default
 		end),
+		TextSize = Constants.FONT_SIZE_DEFAULT,
 	})
 end
 
@@ -103,6 +105,7 @@ function TextDropdown:render()
 			TextXAlignment = Enum.TextXAlignment.Left,
 			BackgroundTransparency = 1,
 			TextColor3 = colors.MainText.Default,
+			TextSize = Constants.FONT_SIZE_DEFAULT,
 		}, {
 			Arrow = e("ImageLabel", {
 				BackgroundTransparency = 1,

@@ -104,6 +104,15 @@ function TextDropdown:render()
 			TextXAlignment = Enum.TextXAlignment.Left,
 			BackgroundTransparency = 1,
 			TextColor3 = colors.MainText.Default,
+		}, {
+			Arrow = e("ImageLabel", {
+				BackgroundTransparency = 1,
+				Size = UDim2.new(0, 11, 0, 11),
+				Image = "rbxassetid://5188755691",
+				AnchorPoint = Vector2.new(1, 0.5),
+				Position = UDim2.new(1, 0, 0.5, 0),
+				ImageColor3 = colors.DropdownArrow.Default,
+			}),
 		})
 
 		return e(Dropdown, {

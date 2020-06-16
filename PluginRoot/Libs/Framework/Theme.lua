@@ -55,6 +55,9 @@ function Theme.new()
 			Hovered = c(60, 60, 60),
 			Focused = c(50, 50, 50),
 		},
+		DropdownArrow = {
+			Default = c(204, 204, 204),
+		},
 	}
 
 	return setmetatable(self, Theme)

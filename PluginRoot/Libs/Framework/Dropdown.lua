@@ -180,6 +180,7 @@ function Dropdown:render()
 			end
 		end
 
+		-- TODO: Render the dropdown above the button if there isn't enough space below to show the whole dropdown.
 		children.DropdownEntries = self.state.open and ModalTargetContext.withConsumer(function(modalTarget)
 			return e(Roact.Portal, {
 				target = modalTarget.target,

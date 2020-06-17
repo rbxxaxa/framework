@@ -107,9 +107,10 @@ function TextBox:render()
 				end),
 				BorderMode = Enum.BorderMode.Inset,
 			}),
+			-- We fudge some offsets/paddings by -1 so that the cursor will always get rendered in the box.
 			Clipper = e("Frame", {
-				Size = UDim2.new(1, -16, 1, 0),
-				Position = UDim2.new(0, 8, 0, 0),
+				Size = UDim2.new(1, -15, 1, 0),
+				Position = UDim2.new(0, 7, 0, 0),
 				BackgroundTransparency = 1,
 				ClipsDescendants = true,
 				[Roact.Change.AbsoluteSize] = function(rbx)
@@ -120,6 +121,9 @@ function TextBox:render()
 				end,
 				ZIndex = 2,
 			}, {
+				Padding = e("UIPadding", {
+					PaddingLeft = UDim.new(0, 1),
+				}),
 				Textbox = e("TextBox", {
 					Text = inputText,
 					BackgroundTransparency = 1,
@@ -133,7 +137,6 @@ function TextBox:render()
 					Size = UDim2.new(0, 9999, 1, 0),
 					TextXAlignment = Enum.TextXAlignment.Left,
 					-- TODO: Improve this. This behaves poorly when the text box is resized.
-					-- TODO: Fudge some stuff so that the cursor is still rendered when it's all the way to the left.
 					Position = self.clipperBindings:map(function(mapped)
 						if mapped.cursorPosition < 0 then
 							return UDim2.new(0, 0, 0, 0)
@@ -146,10 +149,9 @@ function TextBox:render()
 						local clipperRight = mapped.clipperAbsolutePosition.X + mapped.clipperSize.X
 						local cursorX = mapped.textBoxAbsolutePosition.X + textSize.X
 
-						-- We fudge the right by -1 so that the cursor still gets rendered in the box.
 						local newPosition
 						if cursorX >= clipperLeft and cursorX <= clipperRight - 1 then
-							newPosition = UDim2.new(0, mapped.textBoxAbsolutePosition.X-mapped.clipperAbsolutePosition.X, 0, 0)
+							newPosition = UDim2.new(0, mapped.textBoxAbsolutePosition.X-mapped.clipperAbsolutePosition.X - 1, 0, 0)
 						elseif cursorX < clipperLeft then
 							newPosition = UDim2.new(0, -textSize.X, 0, 0)
 						else

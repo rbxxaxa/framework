@@ -6,6 +6,7 @@ local ScrollingVerticalList = load("Framework/ScrollingVerticalList")
 local TextButton = load("Framework/TextButton")
 local TitledSection = load("Framework/TitledSection")
 local TextDropdown = load("Framework/TextDropdown")
+local TextBox = load("Framework/TextBox")
 local StoryWrapper = load("Stories/StoryWrapper")
 
 local e = Roact.createElement
@@ -30,6 +31,10 @@ return function(target)
 				width = UDim.new(1, 0),
 				layoutOrder = 1,
 			}, {
+				Text1 = e(TextBox, {
+					size = UDim2.new(1, 0, 0, 24),
+					layoutOrder = 1,
+				}),
 				Dropdown1 = e(TextDropdown, {
 					size = UDim2.new(1, 0, 0, 24),
 					choiceDatas = {
@@ -39,7 +44,7 @@ return function(target)
 						"1", "2", "3", "4", "5", "6",
 					},
 					buttonText = "Select a choice.",
-					layoutOrder = 1,
+					layoutOrder = 2,
 				}),
 
 				Dropdown2 = e(TextDropdown, {
@@ -51,7 +56,7 @@ return function(target)
 						"A", "B", "C", "D", "E", "E",
 					},
 					buttonText = "Select a choice.",
-					layoutOrder = 2,
+					layoutOrder = 3,
 				})
 			}),
 

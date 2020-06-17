@@ -107,20 +107,20 @@ function Dropdown:render()
 			Size = UDim2.new(1, 0, 1, 0),
 			BackgroundColor3 = self.buttonState:map(function(bs)
 				if self.state.open then
-					return colors.InputFieldBackground.Focused
+					return colors.DropdownButtonBackground.Focused
 				elseif bs == "Hovered" then
-					return colors.InputFieldBackground.Hovered
+					return colors.DropdownButtonBackground.Hovered
 				else
-					return colors.InputFieldBackground.Default
+					return colors.DropdownButtonBackground.Default
 				end
 			end),
 			BorderColor3 = self.buttonState:map(function(bs)
 				if self.state.open then
-					return colors.InputFieldBorder.Focused
+					return colors.DropdownButtonBorder.Focused
 				elseif bs == "Hovered" then
-					return colors.InputFieldBorder.Hovered
+					return colors.DropdownButtonBorder.Hovered
 				else
-					return colors.InputFieldBorder.Default
+					return colors.DropdownButtonBorder.Default
 				end
 			end),
 			BorderMode = Enum.BorderMode.Inset,

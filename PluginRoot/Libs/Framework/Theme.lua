@@ -29,6 +29,12 @@ function Theme.new()
 			PressedIn = c(204, 204, 204),
 			PressedOut = c(255, 255, 255),
 		},
+		DimmedText = {
+			Default = c(102, 102, 102),
+			Hovered = c(170, 170, 170),
+			PressedIn = c(102, 102, 102),
+			PressedOut = c(170, 170, 170),
+		},
 		ScrollBar = {
 			Default = c(80, 80, 80),
 		},

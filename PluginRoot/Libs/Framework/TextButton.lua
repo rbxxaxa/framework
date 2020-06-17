@@ -73,7 +73,7 @@ function TextButton:render()
 					end
 				end),
 				Font = Constants.FONT_DEFAULT,
-				TextSize = Constants.FONT_SIZE_DEFAULT,
+				TextSize = Constants.TEXT_SIZE_DEFAULT,
 				BackgroundColor3 = self.buttonState:map(function(state)
 					if disabled then
 						return colors.Button.Disabled

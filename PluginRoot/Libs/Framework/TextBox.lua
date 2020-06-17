@@ -139,7 +139,7 @@ function TextBox:render()
 						end
 
 						local textUpToCursor = string.sub(mapped.textInTextBox, 1, mapped.cursorPosition-1)
-						local textSize = TextService:GetTextSize(textUpToCursor, Constants.FONT_SIZE_DEFAULT,
+						local textSize = TextService:GetTextSize(textUpToCursor, Constants.TEXT_SIZE_DEFAULT,
 							Constants.FONT_DEFAULT, Vector2.new(9999, 9999))
 						local clipperLeft = mapped.clipperPosition.X
 						local clipperRight = mapped.clipperPosition.X + mapped.clipperSize.X
@@ -157,7 +157,7 @@ function TextBox:render()
 					TextColor3 = colors.MainText.Default,
 					PlaceholderColor3 = colors.DimmedText.Default,
 					Font = Constants.FONT_DEFAULT,
-					TextSize = Constants.FONT_SIZE_DEFAULT,
+					TextSize = Constants.TEXT_SIZE_DEFAULT,
 					[Roact.Change.CursorPosition] = function(rbx)
 						self.updateCursorPosition(rbx.CursorPosition)
 					end,

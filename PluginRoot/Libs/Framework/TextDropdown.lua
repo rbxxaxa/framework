@@ -72,7 +72,7 @@ local function createTextChoiceDisplay(theme, text, index, hoveredIndexBinding)
 		TextColor3 = hoveredIndexBinding:map(function(hoveredIndex)
 			return index == hoveredIndex and colors.DropdownChoiceText.Hovered or colors.DropdownChoiceText.Default
 		end),
-		TextSize = Constants.FONT_SIZE_DEFAULT,
+		TextSize = Constants.TEXT_SIZE_DEFAULT,
 		Font = Constants.FONT_DEFAULT,
 	})
 end
@@ -106,7 +106,7 @@ function TextDropdown:render()
 			TextXAlignment = Enum.TextXAlignment.Left,
 			BackgroundTransparency = 1,
 			TextColor3 = colors.MainText.Default,
-			TextSize = Constants.FONT_SIZE_DEFAULT,
+			TextSize = Constants.TEXT_SIZE_DEFAULT,
 			Font = Constants.FONT_DEFAULT,
 		}, {
 			Arrow = e("ImageLabel", {

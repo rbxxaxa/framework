@@ -73,7 +73,6 @@ function TextButton:render()
 					end
 				end),
 				Font = Constants.FONT_DEFAULT,
-				BorderSizePixel = 0,
 				TextSize = Constants.FONT_SIZE_DEFAULT,
 				BackgroundColor3 = self.buttonState:map(function(state)
 					if disabled then
@@ -81,7 +80,15 @@ function TextButton:render()
 					else
 						return colors.Button[state]
 					end
-				end)
+				end),
+				BorderColor3 = self.buttonState:map(function(state)
+					if disabled then
+						return colors.ButtonBorder.Disabled
+					else
+						return colors.ButtonBorder[state]
+					end
+				end),
+				BorderMode = Enum.BorderMode.Inset,
 			})
 		})
 	end)

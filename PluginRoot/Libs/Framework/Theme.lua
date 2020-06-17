@@ -23,6 +23,13 @@ function Theme.new()
 			PressedOut = c(204, 204, 204),
 			Disabled = c(85, 85, 85),
 		},
+		ButtonBorder = {
+			Default = c(53, 53, 53),
+			Hovered = c(53, 53, 53),
+			PressedIn = c(53, 53, 53),
+			PressedOut = c(53, 53, 53),
+			Disabled = c(53, 53, 53),
+		},
 		MainText = {
 			Default = c(204, 204, 204),
 			Hovered = c(255, 255, 255),
@@ -62,6 +69,11 @@ function Theme.new()
 			Default = c(50, 50, 50),
 			Hovered = c(60, 60, 60),
 			Focused = c(50, 50, 50),
+		},
+		InputFieldBorder = {
+			Default = c(26, 26, 26),
+			Hovered = c(58, 58, 58),
+			Focused = c(53, 181, 255),
 		},
 		DropdownArrow = {
 			Default = c(204, 204, 204),

@@ -82,7 +82,7 @@ function TextBox:render()
 		}, {
 			Background = e("Frame", {
 				Size = UDim2.new(1, 0, 1, 0),
-				BorderSizePixel = 0,
+				BorderSizePixel = 1,
 				BackgroundColor3 = self.frameColorBindings:map(function(mapped)
 					if mapped.focused then
 						return colors.InputFieldBackground.Focused
@@ -93,7 +93,19 @@ function TextBox:render()
 							return colors.InputFieldBackground.Default
 						end
 					end
-				end)
+				end),
+				BorderColor3 = self.frameColorBindings:map(function(mapped)
+					if mapped.focused then
+						return colors.InputFieldBorder.Focused
+					else
+						if mapped.buttonState == "Hovered" then
+							return colors.InputFieldBorder.Hovered
+						else
+							return colors.InputFieldBorder.Default
+						end
+					end
+				end),
+				BorderMode = Enum.BorderMode.Inset,
 			}),
 			Clipper = e("Frame", {
 				Size = UDim2.new(1, -16, 1, 0),

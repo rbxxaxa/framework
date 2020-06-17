@@ -23,6 +23,7 @@ Dropdown.defaultProps = {
 	hoveredIndexChanged = nil,
 	choiceDatas = nil,
 	choiceDisplays = nil,
+	openChanged = nil,
 }
 
 local IDropdown = t.interface({
@@ -35,6 +36,7 @@ local IDropdown = t.interface({
 	hoveredIndexChanged = t.optional(t.callback),
 	choiceDatas = t.optional(t.table),
 	choiceDisplays = t.optional(t.table),
+	openChanged = t.optional(t.callback),
 })
 
 Dropdown.validateProps = function(props)
@@ -74,10 +76,9 @@ function Dropdown:init()
 			self:setState({
 				open = true,
 			})
-		else
-			self:setState({
-				open = false,
-			})
+			if self.props.openChanged then
+				self.props.openChanged(true)
+			end
 		end
 	end
 	self.buttonState, self.updateButtonState = Roact.createBinding("Default")
@@ -94,6 +95,7 @@ function Dropdown:render()
 	local hoveredIndexChanged = props.hoveredIndexChanged
 	local choiceDatas = props.choiceDatas
 	local choiceDisplays = props.choiceDisplays
+	local openChanged = props.openChanged
 
 	local numberOfChoices = choiceDatas and #choiceDatas or 0
 
@@ -112,7 +114,16 @@ function Dropdown:render()
 					return colors.InputFieldBackground.Default
 				end
 			end),
-			BorderSizePixel = 0,
+			BorderColor3 = self.buttonState:map(function(bs)
+				if self.state.open then
+					return colors.InputFieldBorder.Focused
+				elseif bs == "Hovered" then
+					return colors.InputFieldBorder.Hovered
+				else
+					return colors.InputFieldBorder.Default
+				end
+			end),
+			BorderMode = Enum.BorderMode.Inset,
 		}, {
 			Display = buttonDisplay,
 		})
@@ -144,6 +155,9 @@ function Dropdown:render()
 							self:setState({
 								open = false
 							})
+							if openChanged then
+								openChanged(false)
+							end
 							self.updateCanvasOffset(0)
 						end,
 						buttonStateChanged = function(buttonState)
@@ -178,6 +192,9 @@ function Dropdown:render()
 						self:setState({
 							open = false,
 						})
+						if openChanged then
+							openChanged(false)
+						end
 					end,
 				}),
 

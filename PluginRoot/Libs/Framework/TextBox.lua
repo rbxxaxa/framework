@@ -133,6 +133,7 @@ function TextBox:render()
 					Size = UDim2.new(0, 9999, 1, 0),
 					TextXAlignment = Enum.TextXAlignment.Left,
 					-- TODO: Improve this. This behaves poorly when the text box is resized.
+					-- TODO: Fudge some stuff so that the cursor is still rendered when it's all the way to the left.
 					Position = self.clipperBindings:map(function(mapped)
 						if mapped.cursorPosition < 0 then
 							return UDim2.new(0, 0, 0, 0)

@@ -40,14 +40,14 @@ function TextBox:init()
 
 	self.cursorPosition, self.updateCursorPosition = Roact.createBinding(-1)
 	self.clipperSize, self.updateClipperSize = Roact.createBinding(Vector2.new())
-	self.clipperPosition, self.updateClipperPosition = Roact.createBinding(Vector2.new())
-	self.textBoxPosition, self.updateTextBoxPosition = Roact.createBinding(Vector2.new())
+	self.clipperAbsolutePosition, self.updateClipperAbsolutePosition = Roact.createBinding(Vector2.new())
+	self.textBoxAbsolutePosition, self.updateTextBoxAbsolutePosition = Roact.createBinding(Vector2.new())
 	self.textInTextBox, self.updateTextInTextBox = Roact.createBinding(self.props.inputText)
 	self.clipperBindings = Roact.joinBindings({
 		cursorPosition = self.cursorPosition,
 		clipperSize = self.clipperSize,
-		clipperPosition = self.clipperPosition,
-		textBoxPosition = self.textBoxPosition,
+		clipperAbsolutePosition = self.clipperAbsolutePosition,
+		textBoxAbsolutePosition = self.textBoxAbsolutePosition,
 		textInTextBox = self.textInTextBox,
 	})
 	self.textBoxRef = Roact.createRef()
@@ -116,7 +116,7 @@ function TextBox:render()
 					self.updateClipperSize(rbx.AbsoluteSize)
 				end,
 				[Roact.Change.AbsolutePosition] = function(rbx)
-					self.updateClipperPosition(rbx.AbsolutePosition)
+					self.updateClipperAbsolutePosition(rbx.AbsolutePosition)
 				end,
 				ZIndex = 2,
 			}, {
@@ -141,18 +141,21 @@ function TextBox:render()
 						local textUpToCursor = string.sub(mapped.textInTextBox, 1, mapped.cursorPosition-1)
 						local textSize = TextService:GetTextSize(textUpToCursor, Constants.TEXT_SIZE_DEFAULT,
 							Constants.FONT_DEFAULT, Vector2.new(9999, 9999))
-						local clipperLeft = mapped.clipperPosition.X
-						local clipperRight = mapped.clipperPosition.X + mapped.clipperSize.X
-						local cursorX = mapped.textBoxPosition.X + textSize.X
+						local clipperLeft = mapped.clipperAbsolutePosition.X
+						local clipperRight = mapped.clipperAbsolutePosition.X + mapped.clipperSize.X
+						local cursorX = mapped.textBoxAbsolutePosition.X + textSize.X
 
 						-- We fudge the right by -1 so that the cursor still gets rendered in the box.
+						local newPosition
 						if cursorX >= clipperLeft and cursorX <= clipperRight - 1 then
-							return UDim2.new(0, mapped.textBoxPosition.X-mapped.clipperPosition.X, 0, 0)
+							newPosition = UDim2.new(0, mapped.textBoxAbsolutePosition.X-mapped.clipperAbsolutePosition.X, 0, 0)
 						elseif cursorX < clipperLeft then
-							return UDim2.new(0, -textSize.X, 0, 0)
+							newPosition = UDim2.new(0, -textSize.X, 0, 0)
 						else
-							return UDim2.new(0, mapped.clipperSize.X - textSize.X - 1, 0, 0)
+							newPosition = UDim2.new(0, mapped.clipperSize.X - textSize.X - 1, 0, 0)
 						end
+
+						return newPosition
 					end),
 					TextColor3 = colors.MainText.Default,
 					PlaceholderColor3 = colors.DimmedText.Default,
@@ -162,7 +165,7 @@ function TextBox:render()
 						self.updateCursorPosition(rbx.CursorPosition)
 					end,
 					[Roact.Change.AbsolutePosition] = function(rbx)
-						self.updateTextBoxPosition(rbx.AbsolutePosition)
+						self.updateTextBoxAbsolutePosition(rbx.AbsolutePosition)
 					end,
 					[Roact.Change.Text] = function(rbx)
 						self.updateTextInTextBox(rbx.Text)

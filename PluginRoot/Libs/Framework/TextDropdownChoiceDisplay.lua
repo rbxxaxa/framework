@@ -11,8 +11,8 @@ local e = Roact.createElement
 local TextDropdownChoiceDisplay = Roact.PureComponent:extend("TextDropdownChoiceDisplay")
 
 TextDropdownChoiceDisplay.defaultProps = {
-	text = "Choice",
-	index = 1,
+	text = nil,
+	index = nil,
 	hoveredIndexBinding = nil,
 
 	-- Injected by ThemeContext.connect

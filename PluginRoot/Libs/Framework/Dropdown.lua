@@ -96,15 +96,17 @@ end
 
 function Dropdown:didUpdate(prevProps, prevState)
 	if prevProps.disabled ~= self.props.disabled then
-		-- Can't set state here... so we have to wait a frame.
-		-- A little hacky, but this shouldn't be that bad.
-		-- TODO: Revisit this at some point.
-		RunService.RenderStepped:Wait()
-		self:setState({
-			open = false,
-		})
-		if self.props.openChanged then
-			self.props.openChanged(false)
+		if self.props.disabled then
+			-- Can't set state here... so we have to wait a frame.
+			-- A little hacky, but this shouldn't be that bad.
+			-- TODO: Revisit this at some point.
+			RunService.RenderStepped:Wait()
+			self:setState({
+				open = false,
+			})
+			if self.props.openChanged then
+				self.props.openChanged(false)
+			end
 		end
 	end
 end

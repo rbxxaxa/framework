@@ -25,6 +25,9 @@ TextBox.defaultProps = {
 	placeholderText = "",
 	disabled = false,
 	focusLost = nil,
+
+	-- Injected by ThemeContext.connect
+	theme = nil,
 }
 
 local ITextBox = t.interface({
@@ -37,6 +40,8 @@ local ITextBox = t.interface({
 	placeholderText = t.string,
 	disabled = t.boolean,
 	focusLost = t.optional(t.callback),
+
+	theme = t.table,
 })
 
 TextBox.validateProps = function(props)

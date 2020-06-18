@@ -178,4 +178,3 @@ end
 return ThemeContext.connect(TextDropdown, function(theme)
 	return {theme = theme}
 end)
-

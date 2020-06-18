@@ -1,6 +1,8 @@
 local PluginRoot = script:FindFirstAncestor("PluginRoot")
 local load = require(PluginRoot.Loader).load
 
+local RunService = game:GetService("RunService")
+
 local Roact = load("Roact")
 local t = load("t")
 local Button = load("Framework/Button")
@@ -18,6 +20,7 @@ Dropdown.defaultProps = {
 	position = UDim2.new(),
 	layoutOrder = 0,
 	maxRows = 6,
+	disabled = false,
 	buttonDisplay = nil,
 	choiceSelected = nil,
 	hoveredIndexChanged = nil,
@@ -31,6 +34,7 @@ local IDropdown = t.interface({
 	position = t.UDim2,
 	layoutOrder = t.integer,
 	maxRows = t.integer,
+	disabled = t.boolean,
 	buttonDisplay = t.optional(t.table),
 	choiceSelected = t.optional(t.callback),
 	hoveredIndexChanged = t.optional(t.callback),
@@ -82,6 +86,27 @@ function Dropdown:init()
 		end
 	end
 	self.buttonState, self.updateButtonState = Roact.createBinding("Default")
+	self.onButtonStateChanged = function(buttonState)
+		self.updateButtonState(buttonState)
+		if self.props.buttonStateChanged then
+			self.props.buttonStateChanged(buttonState)
+		end
+	end
+end
+
+function Dropdown:didUpdate(prevProps, prevState)
+	if prevProps.disabled ~= self.props.disabled then
+		-- Can't set state here... so we have to wait a frame.
+		-- A little hacky, but this shouldn't be that bad.
+		-- TODO: Revisit this at some point.
+		RunService.Heartbeat:Wait()
+		self:setState({
+			open = false,
+		})
+		if self.props.openChanged then
+			self.props.openChanged(false)
+		end
+	end
 end
 
 function Dropdown:render()
@@ -90,6 +115,7 @@ function Dropdown:render()
 	local position = props.position
 	local layoutOrder = props.layoutOrder
 	local maxRows = props.maxRows
+	local disabled = props.disabled
 	local buttonDisplay = props.buttonDisplay
 	local choiceSelected = props.choiceSelected
 	local hoveredIndexChanged = props.hoveredIndexChanged
@@ -106,7 +132,9 @@ function Dropdown:render()
 		children.DisplayBacker = e("Frame", {
 			Size = UDim2.new(1, 0, 1, 0),
 			BackgroundColor3 = self.buttonState:map(function(bs)
-				if self.state.open then
+				if disabled then
+					return colors.DropdownButtonBackground.Disabled
+				elseif self.state.open then
 					return colors.DropdownButtonBackground.Focused
 				elseif bs == "Hovered" then
 					return colors.DropdownButtonBackground.Hovered
@@ -115,7 +143,9 @@ function Dropdown:render()
 				end
 			end),
 			BorderColor3 = self.buttonState:map(function(bs)
-				if self.state.open then
+				if disabled then
+					return colors.DropdownButtonBorder.Disabled
+				elseif self.state.open then
 					return colors.DropdownButtonBorder.Focused
 				elseif bs == "Hovered" then
 					return colors.DropdownButtonBorder.Hovered
@@ -250,7 +280,8 @@ function Dropdown:render()
 			e(Button, {
 				size = UDim2.new(1, 0, 1, 0),
 				mouse1Pressed = self.onDropdownButtonPressed,
-				buttonStateChanged = self.updateButtonState,
+				buttonStateChanged = self.onButtonStateChanged,
+				disabled = disabled,
 			}, children)
 		})
 	end)

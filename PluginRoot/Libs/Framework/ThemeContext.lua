@@ -2,6 +2,7 @@ local PluginRoot = script:FindFirstAncestor("PluginRoot")
 local load = require(PluginRoot.Loader).load
 
 local Roact = load("Roact")
+local Oyrc = load("Oyrc")
 
 local e = Roact.createElement
 
@@ -43,7 +44,22 @@ local function withConsumer(render)
 	})
 end
 
+local function connect(component, mapValueToProps)
+	local newComponent = Roact.Component:extend("ThemeContextConnected" .. tostring(component))
+
+	function newComponent:render()
+		return withConsumer(function(theme)
+			local props = self.props
+			props = Oyrc.Dictionary.join(props, mapValueToProps(theme))
+			return e(component, props)
+		end)
+	end
+
+	return newComponent
+end
+
 return {
 	withController = withController,
 	withConsumer = withConsumer,
+	connect = connect,
 }

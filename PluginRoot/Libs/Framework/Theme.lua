@@ -77,21 +77,27 @@ function Theme.new()
 		},
 		DropdownArrow = {
 			Default = c(204, 204, 204),
+			Hovered = c(204, 204, 204),
+			Focused = c(204, 204, 204),
+			Disabled = c(85, 85, 85),
 		},
 		DropdownButtonBackground = {
 			Default = c(60, 60, 60),
 			Hovered = c(66, 66, 66),
 			Focused = c(37, 37, 37),
+			Disabled = c(60, 60, 60),
 		},
 		DropdownButtonText = {
 			Default = c(204, 204, 204),
 			Hovered = c(204, 204, 204),
 			Focused = c(204, 204, 204),
+			Disabled = c(85, 85, 85),
 		},
 		DropdownButtonBorder = {
 			Default = c(53, 53, 53),
 			Hovered = c(53, 53, 53),
 			Focused = c(53, 53, 53),
+			Disabled = c(53, 53, 53),
 		},
 	}
 

@@ -16,10 +16,12 @@ TextDropdown.defaultProps = {
 	position = UDim2.new(),
 	layoutOrder = 0,
 	maxRows = 6,
+	disabled = false,
 	choiceSelected = nil,
 	buttonText = "Select a choice...",
 	choiceDatas = nil,
 	choiceTexts = nil,
+	theme = nil,
 }
 
 local ITextDropdown = t.interface({
@@ -27,10 +29,12 @@ local ITextDropdown = t.interface({
 	position = t.UDim2,
 	layoutOrder = t.integer,
 	maxRows = t.integer,
+	disabled = t.boolean,
 	choiceSelected = t.optional(t.callback),
 	buttonText = t.string,
 	choiceDatas = t.optional(t.table),
 	choiceTexts = t.optional(t.table),
+	theme = t.table,
 })
 
 TextDropdown.validateProps = function(props)
@@ -58,23 +62,40 @@ end
 
 function TextDropdown:init()
 	self.hoveredIndex, self.updateHoveredIndex = Roact.createBinding(0)
-end
+	self.buttonState, self.updateButtonState = Roact.createBinding("Default")
+	self.open, self.updateOpen = Roact.createBinding(false)
+	self.arrowColor = Roact.joinBindings({
+		buttonState = self.buttonState,
+		open = self.open,
+	}):map(function(values)
+		local colors = self.props.theme.colors
 
-local function createTextChoiceDisplay(theme, text, index, hoveredIndexBinding)
-	local colors = theme.colors
+		if self.props.disabled then
+			return colors.DropdownArrow.Disabled
+		elseif values.open then
+			return colors.DropdownArrow.Focused
+		elseif values.buttonState == "Hovered" then
+			return colors.DropdownArrow.Hovered
+		else
+			return colors.DropdownArrow.Default
+		end
+	end)
+	self.buttonTextColor = Roact.joinBindings({
+		buttonState = self.buttonState,
+		open = self.open,
+	}):map(function(values)
+		local colors = self.props.theme.colors
 
-	return e("TextLabel", {
-		Size = UDim2.new(1, -16, 1, 0),
-		Position = UDim2.new(0, 8, 0, 0),
-		Text = text,
-		TextXAlignment = Enum.TextXAlignment.Left,
-		BackgroundTransparency = 1,
-		TextColor3 = hoveredIndexBinding:map(function(hoveredIndex)
-			return index == hoveredIndex and colors.DropdownChoiceText.Hovered or colors.DropdownChoiceText.Default
-		end),
-		TextSize = Constants.TEXT_SIZE_DEFAULT,
-		Font = Constants.FONT_DEFAULT,
-	})
+		if self.props.disabled then
+			return colors.DropdownButtonText.Disabled
+		elseif values.open then
+			return colors.DropdownButtonText.Focused
+		elseif values.buttonState == "Hovered" then
+			return colors.DropdownButtonText.Hovered
+		else
+			return colors.DropdownButtonText.Default
+		end
+	end)
 end
 
 function TextDropdown:render()
@@ -83,55 +104,70 @@ function TextDropdown:render()
 	local position = props.position
 	local layoutOrder = props.layoutOrder
 	local maxRows = props.maxRows
+	local disabled = props.disabled
 	local choiceSelected = props.choiceSelected
 	local buttonText = props.buttonText
 	local choiceDatas = props.choiceDatas
 	local choiceTexts = props.choiceTexts
+	local theme = props.theme
 
-	return ThemeContext.withConsumer(function(theme)
-		local colors = theme.colors
+	local colors = theme.colors
 
-		local choiceDisplays = nil
-		if choiceDatas then
-			choiceDisplays = {}
-			for choiceIndex, choiceText in ipairs(choiceTexts) do
-				choiceDisplays[choiceIndex] = createTextChoiceDisplay(theme, choiceText, choiceIndex, self.hoveredIndex)
-			end
-		end
-
-		local buttonDisplay = e("TextLabel", {
-			Size = UDim2.new(1, -16, 1, 0),
-			Position = UDim2.new(0, 8, 0, 0),
-			Text = buttonText,
-			TextXAlignment = Enum.TextXAlignment.Left,
-			BackgroundTransparency = 1,
-			TextColor3 = colors.MainText.Default,
-			TextSize = Constants.TEXT_SIZE_DEFAULT,
-			Font = Constants.FONT_DEFAULT,
-		}, {
-			Arrow = e("ImageLabel", {
+	local choiceDisplays = nil
+	if choiceDatas then
+		choiceDisplays = {}
+		for choiceIndex, choiceText in ipairs(choiceTexts) do
+			choiceDisplays[choiceIndex] = e("TextLabel", {
+				Size = UDim2.new(1, -16, 1, 0),
+				Position = UDim2.new(0, 8, 0, 0),
+				Text = choiceText,
+				TextXAlignment = Enum.TextXAlignment.Left,
 				BackgroundTransparency = 1,
-				Size = UDim2.new(0, 11, 0, 11),
-				Image = "rbxassetid://5188755691",
-				AnchorPoint = Vector2.new(1, 0.5),
-				Position = UDim2.new(1, 0, 0.5, 0),
-				ImageColor3 = colors.DropdownArrow.Default,
-			}),
-		})
+				TextColor3 = self.hoveredIndex:map(function(hoveredIndex)
+					return choiceIndex == hoveredIndex and colors.DropdownChoiceText.Hovered or colors.DropdownChoiceText.Default
+				end),
+				TextSize = Constants.TEXT_SIZE_DEFAULT,
+				Font = Constants.FONT_DEFAULT,
+			})
+		end
+	end
 
-		return e(Dropdown, {
-			size = size,
-			position = position,
-			layoutOrder = layoutOrder,
-			maxRows = maxRows,
-			buttonDisplay = buttonDisplay,
-			choiceSelected = choiceSelected,
-			hoveredIndexChanged = self.updateHoveredIndex,
-			choiceDatas = choiceDatas,
-			choiceDisplays = choiceDisplays,
-		})
-	end)
+	local buttonDisplay = e("TextLabel", {
+		Size = UDim2.new(1, -16, 1, 0),
+		Position = UDim2.new(0, 8, 0, 0),
+		Text = buttonText,
+		TextXAlignment = Enum.TextXAlignment.Left,
+		BackgroundTransparency = 1,
+		TextColor3 = self.buttonTextColor,
+		TextSize = Constants.TEXT_SIZE_DEFAULT,
+		Font = Constants.FONT_DEFAULT,
+	}, {
+		Arrow = e("ImageLabel", {
+			BackgroundTransparency = 1,
+			Size = UDim2.new(0, 11, 0, 11),
+			Image = "rbxassetid://5188755691",
+			AnchorPoint = Vector2.new(1, 0.5),
+			Position = UDim2.new(1, 0, 0.5, 0),
+			ImageColor3 = self.arrowColor,
+		}),
+	})
+
+	return e(Dropdown, {
+		size = size,
+		position = position,
+		layoutOrder = layoutOrder,
+		maxRows = maxRows,
+		disabled = disabled,
+		buttonDisplay = buttonDisplay,
+		choiceSelected = choiceSelected,
+		hoveredIndexChanged = self.updateHoveredIndex,
+		choiceDatas = choiceDatas,
+		choiceDisplays = choiceDisplays,
+		buttonStateChanged = self.updateButtonState,
+	})
 end
 
-return TextDropdown
+return ThemeContext.connect(TextDropdown, function(theme)
+	return {theme = theme}
+end)
 

@@ -6,5 +6,6 @@ Constants.TEXT_SIZE_EXTRA_LARGE = 18
 
 Constants.FONT_DEFAULT = Enum.Font.SourceSans
 Constants.FONT_BOLD = Enum.Font.SourceSansBold
+Constants.FONT_ITALIC = Enum.Font.SourceSansItalic
 
 return Constants

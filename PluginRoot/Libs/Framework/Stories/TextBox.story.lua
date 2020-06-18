@@ -14,7 +14,7 @@ function TextBoxStory:init()
 end
 
 function TextBoxStory:render()
-	return e(TextBox, {
+	local textBox = e(TextBox, {
 		size = UDim2.new(0, 200, 0, 24),
 		position = UDim2.new(0, 100, 0, 100),
 		inputText = self.state.input,
@@ -24,6 +24,23 @@ function TextBoxStory:render()
 				input = text,
 			})
 		end,
+	})
+
+	local textBoxDisabled = e(TextBox, {
+		size = UDim2.new(0, 200, 0, 24),
+		position = UDim2.new(0, 100, 0, 130),
+		inputText = self.state.input,
+		placeholderText = "This is some placeholder.",
+		disabled = true,
+		focusLost = function(text, submitted)
+			self:setState({
+				input = text,
+			})
+		end,
+	})
+
+	return Roact.createFragment({
+		textBox, textBoxDisabled,
 	})
 end
 
@@ -35,7 +52,11 @@ return function(target)
 
 	local story = e(TextBoxStory)
 
-	local handle = Roact.mount(StoryWrapper({ modalTarget = target }, story), target)
+	local handle = Roact.mount(
+		StoryWrapper(
+			{ modalTarget = target },
+			story
+	), target)
 
 	return function()
 		Roact.unmount(handle)

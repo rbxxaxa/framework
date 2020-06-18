@@ -21,6 +21,7 @@ TextBox.defaultProps = {
 	layoutOrder = 0,
 	inputText = "",
 	placeholderText = "",
+	disabled = false,
 	focusLost = nil,
 }
 
@@ -30,6 +31,7 @@ local ITextBox = t.interface({
 	layoutOrder = t.integer,
 	inputText = t.string,
 	placeholderText = t.string,
+	disabled = t.boolean,
 	focusLost = t.optional(t.callback),
 })
 
@@ -42,10 +44,12 @@ function TextBox:init()
 	self.clipperRef = Roact.createRef()
 
 	self.focused, self.updateFocused = Roact.createBinding(false)
+	self.buttonState, self.updateButtonState = Roact.createBinding("Default")
 	self.frameColor = Roact.joinBindings({
 		buttonState = self.buttonState,
 		focused = self.focused,
 	})
+	self.text, self.updateText = Roact.createBinding(self.props.inputText)
 	self.textBoxPosition, self.updateTextBoxPosition = Roact.createBinding(UDim2.new())
 end
 
@@ -55,8 +59,11 @@ function TextBox:render()
 	local position = props.position
 	local layoutOrder = props.layoutOrder
 	local inputText = props.inputText
+	local disabled = props.disabled
 	local focusLost = props.focusLost
 	local placeholderText = props.placeholderText
+
+	self.updateText(inputText)
 
 	return ThemeContext.withConsumer(function(theme)
 		local colors = theme.colors
@@ -67,9 +74,7 @@ function TextBox:render()
 			position = position,
 			layoutOrder = layoutOrder,
 			buttonStateChanged = self.updateButtonState,
-			mouse1Pressed = function()
-				self.textBoxRef:getValue():CaptureFocus()
-			end,
+			disabled = disabled,
 		}, {
 			Background = e("Frame", {
 				Size = UDim2.new(1, 0, 1, 0),
@@ -78,7 +83,9 @@ function TextBox:render()
 					if mapped.focused then
 						return colors.InputFieldBackground.Focused
 					else
-						if mapped.buttonState == "Hovered" then
+						if disabled then
+							return colors.InputFieldBorder.Disabled
+						elseif mapped.buttonState == "Hovered" then
 							return colors.InputFieldBackground.Hovered
 						else
 							return colors.InputFieldBackground.Default
@@ -89,7 +96,9 @@ function TextBox:render()
 					if mapped.focused then
 						return colors.InputFieldBorder.Focused
 					else
-						if mapped.buttonState == "Hovered" then
+						if disabled then
+							return colors.InputFieldBorder.Disabled
+						elseif mapped.buttonState == "Hovered" then
 							return colors.InputFieldBorder.Hovered
 						else
 							return colors.InputFieldBorder.Default
@@ -110,7 +119,22 @@ function TextBox:render()
 				Padding = e("UIPadding", {
 					PaddingLeft = UDim.new(0, 1),
 				}),
-				Textbox = e("TextBox", {
+
+				TextLabel = disabled and e("TextLabel", {
+					Text = inputText == "" and placeholderText or inputText,
+					BackgroundTransparency = 1,
+					TextWrapped = false,
+					Size = UDim2.new(0, 9999, 1, 0),
+					TextXAlignment = Enum.TextXAlignment.Left,
+					Position = UDim2.new(0, 0, 0, 0),
+					TextColor3 = colors.MainText.Disabled,
+					Font = self.text:map(function(text)
+						return text == "" and Constants.FONT_ITALIC or Constants.FONT_DEFAULT
+					end),
+					TextSize = Constants.TEXT_SIZE_DEFAULT,
+				}),
+
+				TextBox = not disabled and e("TextBox", {
 					Text = inputText,
 					BackgroundTransparency = 1,
 					TextWrapped = false,
@@ -121,7 +145,9 @@ function TextBox:render()
 					Position = self.textBoxPosition,
 					TextColor3 = colors.MainText.Default,
 					PlaceholderColor3 = colors.DimmedText.Default,
-					Font = Constants.FONT_DEFAULT,
+					Font = self.text:map(function(text)
+						return text == "" and Constants.FONT_ITALIC or Constants.FONT_DEFAULT
+					end),
 					TextSize = Constants.TEXT_SIZE_DEFAULT,
 					[Roact.Change.CursorPosition] = function(rbx)
 						--[[
@@ -142,6 +168,9 @@ function TextBox:render()
 					[Roact.Event.Focused] = function(rbx)
 						self.updateFocused(true)
 					end,
+					[Roact.Change.Text] = function(rbx)
+						self.updateText(rbx.Text)
+					end
 				}),
 			}),
 		})

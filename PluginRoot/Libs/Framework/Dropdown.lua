@@ -32,10 +32,8 @@ Dropdown.defaultProps = {
 	openChanged = nil,
 	buttonStateChanged = nil,
 
-	-- Injected by ModalTargetContext.connect
-	modalTarget = nil,
-	-- Injected by ThemeContext.connect
-	theme = nil,
+	modalTarget = nil, -- Injected by ModalTargetContext.connect
+	theme = nil, -- Injected by ThemeContext.connect
 }
 
 local IDropdown = t.strictInterface({

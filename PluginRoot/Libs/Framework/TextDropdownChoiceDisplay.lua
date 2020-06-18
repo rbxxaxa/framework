@@ -15,8 +15,7 @@ TextDropdownChoiceDisplay.defaultProps = {
 	index = nil,
 	hoveredIndexBinding = nil,
 
-	-- Injected by ThemeContext.connect
-	theme = nil,
+	theme = nil, -- Injected by ThemeContext.connect
 }
 
 local ITextDropdownChoiceDisplay = t.strictInterface({

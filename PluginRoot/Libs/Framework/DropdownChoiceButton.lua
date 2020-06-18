@@ -19,8 +19,7 @@ DropdownChoiceButton.defaultProps = {
 
 	[Roact.Children] = nil,
 
-	-- Injected by ThemeContext.connect
-	theme = nil,
+	theme = nil, -- Injected by ThemeContext.connect
 }
 
 local IDropdownChoiceButton = t.strictInterface({

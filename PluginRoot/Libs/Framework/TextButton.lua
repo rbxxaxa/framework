@@ -22,8 +22,7 @@ TextButton.defaultProps = {
 	mouse1Pressed = nil,
 	disabled = false,
 
-	-- Injected by ThemeContext.connect
-	theme = nil,
+	theme = nil, -- Injected by ThemeContext.connect
 }
 
 local ITextButton = t.strictInterface({

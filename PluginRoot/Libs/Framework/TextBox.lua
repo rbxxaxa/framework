@@ -26,8 +26,7 @@ TextBox.defaultProps = {
 	disabled = false,
 	focusLost = nil,
 
-	-- Injected by ThemeContext.connect
-	theme = nil,
+	theme = nil, -- Injected by ThemeContext.connect
 }
 
 local ITextBox = t.strictInterface({

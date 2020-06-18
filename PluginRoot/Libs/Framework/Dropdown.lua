@@ -224,19 +224,14 @@ function Dropdown:render()
 	local layoutOrder = props.layoutOrder
 	local anchorPoint = props.anchorPoint
 	local zIndex = props.zIndex
-	local maxRows = props.maxRows
 	local disabled = props.disabled
 	local buttonDisplay = props.buttonDisplay
-	local choiceSelected = props.choiceSelected
-	local hoveredIndexChanged = props.hoveredIndexChanged
 	local choiceDatas = props.choiceDatas
 	local choiceDisplays = props.choiceDisplays
-	local openChanged = props.openChanged
 	local modalTarget = self.props.modalTarget
 	local theme = self.props.theme
 
 	local numberOfChoices = choiceDatas and #choiceDatas or 0
-	local colors = theme.colors
 
 	local children = {}
 	children.DisplayBacker = e("Frame", {
@@ -263,41 +258,38 @@ function Dropdown:render()
 	end
 
 	-- TODO: Render the dropdown above the button if there isn't enough space below to show the whole dropdown.
-	children.DropdownEntries = self.state.open and ModalTargetContext.withConsumer(function(modalTarget)
-		return e(Roact.Portal, {
-			target = modalTarget.target,
-		}, {
-			e("TextButton", {
-				Size = UDim2.new(1, 0, 1, 0),
-				Text = "",
-				BackgroundTransparency = 1,
-				[Roact.Event.MouseButton1Down] = self.onBackgroundCloseDetectorClicked,
-			}),
+	children.DropdownEntries = self.state.open and e(Roact.Portal, {
+		target = modalTarget.target,
+	}, {
+		e("TextButton", {
+			Size = UDim2.new(1, 0, 1, 0),
+			Text = "",
+			BackgroundTransparency = 1,
+			[Roact.Event.MouseButton1Down] = self.onBackgroundCloseDetectorClicked,
+		}),
 
-			e("Frame", {
-				Size = self.dropdownSize,
-				Position = self.dropdownPosition,
-				BackgroundTransparency = 1,
-				ZIndex = 2,
+		e("Frame", {
+			Size = self.dropdownSize,
+			Position = self.dropdownPosition,
+			BackgroundTransparency = 1,
+			ZIndex = 2,
+		}, {
+			e(ShadowedFrame, {
+				position = UDim2.new(0, 0, 0, 0),
+				size = UDim2.new(1, 0, 1, 0),
 			}, {
-				e(ShadowedFrame, {
-					position = UDim2.new(0, 0, 0, 0),
+				e(ScrollingVerticalList, {
 					size = UDim2.new(1, 0, 1, 0),
-				}, {
-					e(ScrollingVerticalList, {
-						size = UDim2.new(1, 0, 1, 0),
-						paddingTop = 0,
-						paddingRight = 0,
-						paddingBottom = 0,
-						paddingLeft = 0,
-						paddingList = 0,
-						contentBackgroundColor = theme.choicesBackground,
-					}, scrollingFrameChildren)
-				})
+					paddingTop = 0,
+					paddingRight = 0,
+					paddingBottom = 0,
+					paddingLeft = 0,
+					paddingList = 0,
+					contentBackgroundColor = theme.choicesBackground,
+				}, scrollingFrameChildren)
 			})
 		})
-	end)
-
+	})
 
 	-- TODO: make me modal
 	return e("Frame", {

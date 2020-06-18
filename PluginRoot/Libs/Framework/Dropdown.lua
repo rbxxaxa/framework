@@ -91,46 +91,38 @@ function Dropdown:init()
 	self.hoveredIndex, self.updateHoveredIndex = Roact.createBinding(0)
 	self.onDropdownButtonPressed = function()
 		if not self.state.open then
-			self:setState({
-				open = true,
-			})
-			if self.props.openChanged then
-				self.props.openChanged(true)
-			end
+			self:setOpen(true)
 		end
 	end
 	self.buttonState, self.updateButtonState = Roact.createBinding("Default")
+	self.open, self.updateOpen = Roact.createBinding(false)
 	self.onButtonStateChanged = function(buttonState)
 		self.updateButtonState(buttonState)
 		if self.props.buttonStateChanged then
 			self.props.buttonStateChanged(buttonState)
 		end
 	end
-	self.buttonBackgroundColor = self.buttonState:map(function(bs)
-		local colors = self.props.theme.colors
-
+	self.buttonColorState = Roact.joinBindings({
+		open = self.open,
+		buttonState = self.buttonState,
+	}):map(function(mapped)
 		if self.props.disabled then
-			return colors.DropdownButtonBackground.Disabled
-		elseif self.state.open then
-			return colors.DropdownButtonBackground.Focused
-		elseif bs == "Hovered" then
-			return colors.DropdownButtonBackground.Hovered
+			return "Disabled"
+		elseif mapped.open then
+			return "Focused"
+		elseif mapped.buttonState == "Hovered" then
+			return "Hovered"
 		else
-			return colors.DropdownButtonBackground.Default
+			return "Default"
 		end
 	end)
-	self.buttonBorderColor = self.buttonState:map(function(bs)
+	self.buttonBackgroundColor = self.buttonColorState:map(function(colorState)
 		local colors = self.props.theme.colors
-
-		if self.props.disabled then
-			return colors.DropdownButtonBorder.Disabled
-		elseif self.state.open then
-			return colors.DropdownButtonBorder.Focused
-		elseif bs == "Hovered" then
-			return colors.DropdownButtonBorder.Hovered
-		else
-			return colors.DropdownButtonBorder.Default
-		end
+		return colors.DropdownButtonBackground[colorState]
+	end)
+	self.buttonBorderColor = self.buttonColorState:map(function(colorState)
+		local colors = self.props.theme.colors
+		return colors.DropdownButtonBorder[colorState]
 	end)
 	self.scrollingFrameEntrySize = self.buttonAbsoluteSize:map(function(absoluteSize)
 		return UDim2.new(1, 0, 0, absoluteSize.Y)
@@ -151,12 +143,7 @@ function Dropdown:init()
 		return UDim2.new(0, x, 0, y)
 	end)
 	self.onBackgroundCloseDetectorClicked = function()
-		self:setState({
-			open = false,
-		})
-		if self.props.openChanged then
-			self.props.openChanged(false)
-		end
+		self:setOpen(false)
 	end
 	self.onButtonAbsoluteSizeChanged = function(rbx)
 		self.updateButtonAbsoluteSize(rbx.AbsoluteSize)
@@ -168,19 +155,13 @@ function Dropdown:init()
 		local props = self.props
 		local choiceSelected = props.choiceSelected
 		local choiceDatas = props.choiceDatas
-		local openChanged = props.openChanged
 
 		local choiceData = choiceDatas[choiceIndex]
 
 		if choiceSelected then
 			choiceSelected(choiceIndex, choiceData)
 		end
-		self:setState({
-			open = false
-		})
-		if openChanged then
-			openChanged(false)
-		end
+		self:setOpen(false)
 	end
 	self.onChoiceButtonStateChanged = function(choiceIndex, buttonState)
 		local props = self.props
@@ -207,12 +188,7 @@ function Dropdown:didUpdate(prevProps, prevState)
 			-- A little hacky, but this shouldn't be that bad.
 			-- TODO: Revisit this at some point.
 			RunService.RenderStepped:Wait()
-			self:setState({
-				open = false,
-			})
-			if self.props.openChanged then
-				self.props.openChanged(false)
-			end
+			self:setOpen(false)
 		end
 	end
 end
@@ -309,6 +285,16 @@ function Dropdown:render()
 			disabled = disabled,
 		}, children)
 	})
+end
+
+function Dropdown:setOpen(open)
+	self:setState({
+		open = open,
+	})
+	self.updateOpen(open)
+	if self.props.openChanged then
+		self.props.openChanged(open)
+	end
 end
 
 return ThemeContext.connect(ModalTargetContext.connect(Dropdown, function(modalTarget)

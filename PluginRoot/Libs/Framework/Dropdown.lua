@@ -10,6 +10,7 @@ local ScrollingVerticalList = load("Framework/ScrollingVerticalList")
 local ShadowedFrame = load("Framework/ShadowedFrame")
 local ThemeContext = load("Framework/ThemeContext")
 local ModalTargetContext = load("Framework/ModalTargetContext")
+local DropdownChoiceButton = load("Framework/DropdownChoiceButton")
 
 local e = Roact.createElement
 
@@ -163,6 +164,40 @@ function Dropdown:init()
 	self.onButtonAbsolutePositionChanged = function(rbx)
 		self.updateButtonAbsolutePosition(rbx.AbsolutePosition)
 	end
+	self.onChoicePressed = function(choiceIndex)
+		local props = self.props
+		local choiceSelected = props.choiceSelected
+		local choiceDatas = props.choiceDatas
+		local openChanged = props.openChanged
+
+		local choiceData = choiceDatas[choiceIndex]
+
+		if choiceSelected then
+			choiceSelected(choiceIndex, choiceData)
+		end
+		self:setState({
+			open = false
+		})
+		if openChanged then
+			openChanged(false)
+		end
+	end
+	self.onChoiceButtonStateChanged = function(choiceIndex, buttonState)
+		local props = self.props
+		local hoveredIndexChanged = props.hoveredIndexChanged
+
+		if buttonState == "Hovered" then
+			self.updateHoveredIndex(choiceIndex)
+			if hoveredIndexChanged then
+				hoveredIndexChanged(choiceIndex)
+			end
+		elseif self.hoveredIndex:getValue() == choiceIndex then
+			self.updateHoveredIndex(0)
+			if hoveredIndexChanged then
+				hoveredIndexChanged(0)
+			end
+		end
+	end
 end
 
 function Dropdown:didUpdate(prevProps, prevState)
@@ -217,50 +252,13 @@ function Dropdown:render()
 	if numberOfChoices > 0 then
 		for choiceIndex = 1, numberOfChoices do
 			local choiceDisplay = choiceDisplays[choiceIndex]
-			local choiceData = choiceDatas[choiceIndex]
-			scrollingFrameChildren[choiceIndex] = e("Frame", {
-				BackgroundTransparency = 0,
-				BorderSizePixel = 0,
-				Size = self.scrollingFrameEntrySize,
-				LayoutOrder = choiceIndex,
-				BackgroundColor3 = self.hoveredIndex:map(function(idx)
-					if choiceIndex == idx then
-						return colors.DropdownChoiceBackground.Hovered
-					else
-						return colors.DropdownChoiceBackground.Default
-					end
-				end)
-			}, {
-				ChoiceButton = e(Button, {
-					size = UDim2.new(1, 0, 1, 0),
-					mouse1Pressed = function()
-						if choiceSelected then
-							choiceSelected(choiceIndex, choiceData)
-						end
-						self:setState({
-							open = false
-						})
-						if openChanged then
-							openChanged(false)
-						end
-					end,
-					buttonStateChanged = function(buttonState)
-						if buttonState == "Hovered" then
-							self.updateHoveredIndex(choiceIndex)
-							if hoveredIndexChanged then
-								hoveredIndexChanged(choiceIndex)
-							end
-						elseif self.hoveredIndex:getValue() == choiceIndex then
-							self.updateHoveredIndex(0)
-							if hoveredIndexChanged then
-								hoveredIndexChanged(0)
-							end
-						end
-					end,
-				}, {
-					choiceDisplay,
-				})
-			})
+			scrollingFrameChildren[choiceIndex] = e(DropdownChoiceButton, {
+				sizeBinding = self.scrollingFrameEntrySize,
+				index = choiceIndex,
+				hoveredIndexBinding = self.hoveredIndex,
+				choicePressed = self.onChoicePressed,
+				buttonStateChanged = self.onChoiceButtonStateChanged,
+			}, {choiceDisplay})
 		end
 	end
 

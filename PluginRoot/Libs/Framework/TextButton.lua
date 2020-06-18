@@ -21,6 +21,9 @@ TextButton.defaultProps = {
 	mouse1Clicked = nil,
 	mouse1Pressed = nil,
 	disabled = false,
+
+	-- Injected by ThemeContext.connect
+	theme = nil,
 }
 
 local ITextButton = t.interface({
@@ -33,6 +36,8 @@ local ITextButton = t.interface({
 	mouse1Clicked = t.optional(t.callback),
 	mouse1Pressed = t.optional(t.callback),
 	disabled = t.boolean,
+
+	theme = t.table,
 })
 
 TextButton.validateProps = function(props)
@@ -41,6 +46,33 @@ end
 
 function TextButton:init()
 	self.buttonState, self.updateButtonState = Roact.createBinding("Default")
+	self.textColor = self.buttonState:map(function(buttonState)
+		local colors = self.props.theme.colors
+
+		if self.props.disabled then
+			return colors.ButtonText.Disabled
+		else
+			return colors.ButtonText[buttonState]
+		end
+	end)
+	self.backgroundColor = self.buttonState:map(function(buttonState)
+		local colors = self.props.theme.colors
+
+		if self.props.disabled then
+			return colors.Button.Disabled
+		else
+			return colors.Button[buttonState]
+		end
+	end)
+	self.borderColor = self.buttonState:map(function(buttonState)
+		local colors = self.props.theme.colors
+
+		if self.props.disabled then
+			return colors.ButtonBorder.Disabled
+		else
+			return colors.ButtonBorder[buttonState]
+		end
+	end)
 end
 
 function TextButton:render()
@@ -55,51 +87,31 @@ function TextButton:render()
 	local mouse1Pressed = props.mouse1Pressed
 	local disabled = props.disabled
 
-	return ThemeContext.withConsumer(function(theme)
-		local colors = theme.colors
-
-		-- TODO: make me modal
-		return e(Button, {
-			size = size,
-			position = position,
-			layoutOrder = layoutOrder,
-			anchorPoint = anchorPoint,
-			zIndex = zIndex,
-			buttonStateChanged = self.updateButtonState,
-			mouse1Clicked = mouse1Clicked,
-			mouse1Pressed = mouse1Pressed,
-			disabled = disabled,
-		}, {
-			Text = e("TextLabel", {
-				Size = UDim2.new(1, 0, 1, 0),
-				Text = text,
-				TextColor3 = self.buttonState:map(function(state)
-					if disabled then
-						return colors.ButtonText.Disabled
-					else
-						return colors.ButtonText[state]
-					end
-				end),
-				Font = Constants.FONT_DEFAULT,
-				TextSize = Constants.TEXT_SIZE_DEFAULT,
-				BackgroundColor3 = self.buttonState:map(function(state)
-					if disabled then
-						return colors.Button.Disabled
-					else
-						return colors.Button[state]
-					end
-				end),
-				BorderColor3 = self.buttonState:map(function(state)
-					if disabled then
-						return colors.ButtonBorder.Disabled
-					else
-						return colors.ButtonBorder[state]
-					end
-				end),
-				BorderMode = Enum.BorderMode.Inset,
-			})
+	-- TODO: make me modal
+	return e(Button, {
+		size = size,
+		position = position,
+		layoutOrder = layoutOrder,
+		anchorPoint = anchorPoint,
+		zIndex = zIndex,
+		buttonStateChanged = self.updateButtonState,
+		mouse1Clicked = mouse1Clicked,
+		mouse1Pressed = mouse1Pressed,
+		disabled = disabled,
+	}, {
+		Text = e("TextLabel", {
+			Size = UDim2.new(1, 0, 1, 0),
+			Text = text,
+			TextColor3 = self.textColor,
+			Font = Constants.FONT_DEFAULT,
+			TextSize = Constants.TEXT_SIZE_DEFAULT,
+			BackgroundColor3 = self.backgroundColor,
+			BorderColor3 = self.borderColor,
+			BorderMode = Enum.BorderMode.Inset,
 		})
-	end)
+	})
 end
 
-return TextButton
+return ThemeContext.connect(TextButton, function(theme)
+	return {theme = theme}
+end)

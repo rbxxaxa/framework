@@ -27,7 +27,7 @@ return function(target)
 			size = UDim2.new(1, 0, 1, 0),
 		}, {
 			Section1 = e(TitledSection, {
-				title = "SECTION 1",
+				title = "Section 1",
 				width = UDim.new(1, 0),
 				layoutOrder = 1,
 			}, {
@@ -61,7 +61,7 @@ return function(target)
 			}),
 
 			Section2 = e(TitledSection, {
-				title = "SECTION 2",
+				title = "Section 2",
 				width = UDim.new(1, 0),
 				layoutOrder = 2,
 			}, {

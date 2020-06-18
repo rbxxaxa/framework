@@ -94,7 +94,7 @@ function TitledSection:render()
 					Position = UDim2.new(0, 8, 0, 0),
 					Size = UDim2.new(1, 0, 0, HEADER_HEIGHT),
 					Font = Constants.FONT_BOLD,
-					TextSize = Constants.TEXT_SIZE_EXTRA_LARGE,
+					TextSize = Constants.TEXT_SIZE_LARGE,
 					TextXAlignment = Enum.TextXAlignment.Left,
 					TextColor3 = colors.MainText.Default,
 					TextTruncate = Enum.TextTruncate.AtEnd,

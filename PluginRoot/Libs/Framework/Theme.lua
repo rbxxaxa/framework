@@ -44,19 +44,19 @@ function Theme.new()
 			PressedOut = c(170, 170, 170),
 		},
 		ScrollBar = {
-			Default = c(80, 80, 80),
-		},
-		ScrollBarBackground = {
 			Default = c(60, 60, 60),
 		},
+		ScrollBarBackground = {
+			Default = c(41, 41, 41),
+		},
 		ScrollingFrameContentBackground = {
-			Default = c(32, 32, 32),
+			Default = c(37, 37, 37),
 		},
 		TitledSectionTitleBackground = {
-			Default = c(8, 8, 8),
+			Default = c(53, 53, 53),
 		},
 		TitledSectionContentBackground = {
-			Default = c(20, 20, 20),
+			Default = c(46, 46, 46),
 		},
 		DropdownChoiceBackground = {
 			Default = c(46, 46, 46),

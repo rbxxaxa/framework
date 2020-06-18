@@ -12,9 +12,12 @@ local RECT_OFFSET = Vector2.new(0, 0)
 local RECT_SIZE = Vector2.new(10, 10)
 local SLICE_CENTER = Rect.new(4, 4, 5, 5)
 
+-- TODO: is the "borderColor" and "borderColorBinding" a convention the framework should stick with?
 BorderedFrame.defaultProps = {
 	borderColor = Color3.new(0, 0, 0),
 	backgroundColor = Color3.new(1, 1, 1),
+	borderColorBinding = nil,
+	backgroundColorBinding = nil,
 	size = UDim2.new(0, 100, 0, 100),
 	position = UDim2.new(0, 0, 0, 0),
 	anchorPoint = Vector2.new(0, 0),
@@ -31,6 +34,8 @@ BorderedFrame.defaultProps = {
 local IBorderedFrame = t.strictInterface({
 	borderColor = t.Color3,
 	backgroundColor = t.Color3,
+	borderColorBinding = t.optional(t.table),
+	backgroundColorBinding = t.optional(t.table),
 	size = t.UDim2,
 	position = t.UDim2,
 	anchorPoint = t.Vector2,
@@ -52,6 +57,8 @@ function BorderedFrame:render()
 	local props = self.props
 	local borderColor = props.borderColor
 	local backgroundColor = props.backgroundColor
+	local borderColorBinding = props.borderColorBinding
+	local backgroundColorBinding = props.backgroundColorBinding
 	local size = props.size
 	local position = props.position
 	local anchorPoint = props.AnchorPoint
@@ -81,7 +88,7 @@ function BorderedFrame:render()
 		BackgroundTransparency = 1,
 		Image = fillImage,
 		ImageTransparency = backgroundTransparency,
-		ImageColor3 = backgroundColor,
+		ImageColor3 = backgroundColorBinding or backgroundColor,
 		ScaleType = Enum.ScaleType.Slice,
 		ImageRectOffset = RECT_OFFSET,
 		ImageRectSize = RECT_SIZE,
@@ -92,7 +99,7 @@ function BorderedFrame:render()
 			Size = UDim2.new(1, 0, 1, 0),
 			BackgroundTransparency = 1,
 			Image = borderImage,
-			ImageColor3 = borderColor,
+			ImageColor3 = borderColorBinding or borderColor,
 			ScaleType = Enum.ScaleType.Slice,
 			ImageRectOffset = RECT_OFFSET,
 			ImageRectSize = RECT_SIZE,

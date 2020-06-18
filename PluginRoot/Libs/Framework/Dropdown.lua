@@ -11,6 +11,7 @@ local ShadowedFrame = load("Framework/ShadowedFrame")
 local ThemeContext = load("Framework/ThemeContext")
 local ModalTargetContext = load("Framework/ModalTargetContext")
 local DropdownChoiceButton = load("Framework/DropdownChoiceButton")
+local BorderedFrame = load("Framework/BorderedFrame")
 
 local e = Roact.createElement
 
@@ -208,11 +209,11 @@ function Dropdown:render()
 	local numberOfChoices = choiceDatas and #choiceDatas or 0
 
 	local children = {}
-	children.ButtonDisplayBacker = e("Frame", {
-		Size = UDim2.new(1, 0, 1, 0),
-		BackgroundColor3 = self.buttonBackgroundColor,
-		BorderColor3 = self.buttonBorderColor,
-		BorderMode = Enum.BorderMode.Inset,
+	children.ButtonDisplayBacker = e(BorderedFrame, {
+		size = UDim2.new(1, 0, 1, 0),
+		backgroundColorBinding = self.buttonBackgroundColor,
+		borderColorBinding = self.buttonBorderColor,
+		borderStyle = "Round",
 	}, {
 		Display = buttonDisplay,
 	})

@@ -6,6 +6,7 @@ local t = load("t")
 local Button = load("Framework/Button")
 local ThemeContext = load("Framework/ThemeContext")
 local Constants = load("Framework/Constants")
+local BorderedFrame = load("Framework/BorderedFrame")
 
 local e = Roact.createElement
 
@@ -98,15 +99,20 @@ function TextButton:render()
 		mouse1Pressed = mouse1Pressed,
 		disabled = disabled,
 	}, {
+		Backer = e(BorderedFrame, {
+			size = UDim2.new(1, 0, 1, 0),
+			backgroundColorBinding = self.backgroundColor,
+			borderColorBinding = self.borderColor,
+			borderStyle = "Round",
+		}),
 		Text = e("TextLabel", {
 			Size = UDim2.new(1, 0, 1, 0),
 			Text = text,
 			TextColor3 = self.textColor,
 			Font = Constants.FONT_DEFAULT,
 			TextSize = Constants.TEXT_SIZE_DEFAULT,
-			BackgroundColor3 = self.backgroundColor,
-			BorderColor3 = self.borderColor,
-			BorderMode = Enum.BorderMode.Inset,
+			BackgroundTransparency = 1,
+			ZIndex = 2,
 		})
 	})
 end

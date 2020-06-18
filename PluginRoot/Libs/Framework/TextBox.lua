@@ -10,6 +10,7 @@ local t = load("t")
 local Button = load("Framework/Button")
 local ThemeContext = load("Framework/ThemeContext")
 local Constants = load("Framework/Constants")
+local BorderedFrame = load("Framework/BorderedFrame")
 
 local e = Roact.createElement
 
@@ -145,12 +146,11 @@ function TextBox:render()
 		buttonStateChanged = self.updateButtonState,
 		disabled = disabled,
 	}, {
-		Background = e("Frame", {
-			Size = UDim2.new(1, 0, 1, 0),
-			BorderSizePixel = 1,
-			BackgroundColor3 = self.backgroundColor,
-			BorderColor3 = self.borderColor,
-			BorderMode = Enum.BorderMode.Inset,
+		Background = e(BorderedFrame, {
+			size = UDim2.new(1, 0, 1, 0),
+			backgroundColorBinding = self.backgroundColor,
+			borderColorBinding = self.borderColor,
+			borderStyle = "Round",
 		}),
 		-- We fudge some offsets/paddings by -1 so that the cursor will always get rendered in the box.
 		Clipper = e("Frame", {

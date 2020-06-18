@@ -210,7 +210,7 @@ function Dropdown:render()
 	local numberOfChoices = choiceDatas and #choiceDatas or 0
 
 	local children = {}
-	children.DisplayBacker = e("Frame", {
+	children.ButtonDisplayBacker = e("Frame", {
 		Size = UDim2.new(1, 0, 1, 0),
 		BackgroundColor3 = self.buttonBackgroundColor,
 		BorderColor3 = self.buttonBorderColor,

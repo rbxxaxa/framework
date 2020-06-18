@@ -1,6 +1,8 @@
 local PluginRoot = script:FindFirstAncestor("PluginRoot")
 local load = require(PluginRoot.Loader).load
 
+local RunService = game:GetService("RunService")
+
 local TextService = game:GetService("TextService")
 
 local Roact = load("Roact")
@@ -36,26 +38,15 @@ TextBox.validateProps = function(props)
 end
 
 function TextBox:init()
-	self.buttonState, self.updateButtonState = Roact.createBinding("Default")
-
-	self.cursorPosition, self.updateCursorPosition = Roact.createBinding(-1)
-	self.clipperSize, self.updateClipperSize = Roact.createBinding(Vector2.new())
-	self.clipperAbsolutePosition, self.updateClipperAbsolutePosition = Roact.createBinding(Vector2.new())
-	self.textBoxAbsolutePosition, self.updateTextBoxAbsolutePosition = Roact.createBinding(Vector2.new())
-	self.textInTextBox, self.updateTextInTextBox = Roact.createBinding(self.props.inputText)
-	self.clipperBindings = Roact.joinBindings({
-		cursorPosition = self.cursorPosition,
-		clipperSize = self.clipperSize,
-		clipperAbsolutePosition = self.clipperAbsolutePosition,
-		textBoxAbsolutePosition = self.textBoxAbsolutePosition,
-		textInTextBox = self.textInTextBox,
-	})
 	self.textBoxRef = Roact.createRef()
+	self.clipperRef = Roact.createRef()
+
 	self.focused, self.updateFocused = Roact.createBinding(false)
-	self.frameColorBindings = Roact.joinBindings({
+	self.frameColor = Roact.joinBindings({
 		buttonState = self.buttonState,
 		focused = self.focused,
 	})
+	self.textBoxPosition, self.updateTextBoxPosition = Roact.createBinding(UDim2.new())
 end
 
 function TextBox:render()
@@ -83,7 +74,7 @@ function TextBox:render()
 			Background = e("Frame", {
 				Size = UDim2.new(1, 0, 1, 0),
 				BorderSizePixel = 1,
-				BackgroundColor3 = self.frameColorBindings:map(function(mapped)
+				BackgroundColor3 = self.frameColor:map(function(mapped)
 					if mapped.focused then
 						return colors.InputFieldBackground.Focused
 					else
@@ -94,7 +85,7 @@ function TextBox:render()
 						end
 					end
 				end),
-				BorderColor3 = self.frameColorBindings:map(function(mapped)
+				BorderColor3 = self.frameColor:map(function(mapped)
 					if mapped.focused then
 						return colors.InputFieldBorder.Focused
 					else
@@ -113,12 +104,7 @@ function TextBox:render()
 				Position = UDim2.new(0, 7, 0, 0),
 				BackgroundTransparency = 1,
 				ClipsDescendants = true,
-				[Roact.Change.AbsoluteSize] = function(rbx)
-					self.updateClipperSize(rbx.AbsoluteSize)
-				end,
-				[Roact.Change.AbsolutePosition] = function(rbx)
-					self.updateClipperAbsolutePosition(rbx.AbsolutePosition)
-				end,
+				[Roact.Ref] = self.clipperRef,
 				ZIndex = 2,
 			}, {
 				Padding = e("UIPadding", {
@@ -130,48 +116,20 @@ function TextBox:render()
 					TextWrapped = false,
 					ClearTextOnFocus = false,
 					PlaceholderText = placeholderText,
-					--[[
-						Somehow, when the text behind the cursor is 2X that of the box's absolute size, Roblox
-						stops rendering it... As a fix, we just make the textbox's size some huge number.
-					]]
 					Size = UDim2.new(0, 9999, 1, 0),
 					TextXAlignment = Enum.TextXAlignment.Left,
-					-- TODO: Improve this. This behaves poorly when the text box is resized.
-					Position = self.clipperBindings:map(function(mapped)
-						if mapped.cursorPosition < 0 then
-							return UDim2.new(0, 0, 0, 0)
-						end
-
-						local textUpToCursor = string.sub(mapped.textInTextBox, 1, mapped.cursorPosition-1)
-						local textSize = TextService:GetTextSize(textUpToCursor, Constants.TEXT_SIZE_DEFAULT,
-							Constants.FONT_DEFAULT, Vector2.new(9999, 9999))
-						local clipperLeft = mapped.clipperAbsolutePosition.X
-						local clipperRight = mapped.clipperAbsolutePosition.X + mapped.clipperSize.X
-						local cursorX = mapped.textBoxAbsolutePosition.X + textSize.X
-
-						local newPosition
-						if cursorX >= clipperLeft and cursorX <= clipperRight - 1 then
-							newPosition = UDim2.new(0, mapped.textBoxAbsolutePosition.X-mapped.clipperAbsolutePosition.X - 1, 0, 0)
-						elseif cursorX < clipperLeft then
-							newPosition = UDim2.new(0, -textSize.X, 0, 0)
-						else
-							newPosition = UDim2.new(0, mapped.clipperSize.X - textSize.X - 1, 0, 0)
-						end
-
-						return newPosition
-					end),
+					Position = self.textBoxPosition,
 					TextColor3 = colors.MainText.Default,
 					PlaceholderColor3 = colors.DimmedText.Default,
 					Font = Constants.FONT_DEFAULT,
 					TextSize = Constants.TEXT_SIZE_DEFAULT,
 					[Roact.Change.CursorPosition] = function(rbx)
-						self.updateCursorPosition(rbx.CursorPosition)
-					end,
-					[Roact.Change.AbsolutePosition] = function(rbx)
-						self.updateTextBoxAbsolutePosition(rbx.AbsolutePosition)
-					end,
-					[Roact.Change.Text] = function(rbx)
-						self.updateTextInTextBox(rbx.Text)
+						--[[
+							This is delayed by a frame because clipping depends on a bunch of properties
+							and these properties might be updated after CursorPosition is updated.
+						]]
+						RunService.RenderStepped:Wait()
+						self:updateClipping()
 					end,
 					[Roact.Ref] = self.textBoxRef,
 					[Roact.Event.FocusLost] = function(rbx, enterPressed, inputThatCausedLostFocus)
@@ -188,6 +146,33 @@ function TextBox:render()
 			}),
 		})
 	end)
+end
+
+function TextBox:updateClipping()
+	local clipper = self.clipperRef:getValue()
+	local textBox = self.textBoxRef:getValue()
+
+	if textBox.CursorPosition < 0 then
+		return UDim2.new(0, 0, 0, 0)
+	end
+
+	local textUpToCursor = string.sub(textBox.Text, 1, textBox.CursorPosition-1)
+	local textSize = TextService:GetTextSize(textUpToCursor, Constants.TEXT_SIZE_DEFAULT,
+		Constants.FONT_DEFAULT, Vector2.new(9999, 9999))
+	local clipperLeft = clipper.AbsolutePosition.X
+	local clipperRight = clipper.AbsolutePosition.X + clipper.AbsoluteSize.X
+	local cursorX = textBox.AbsolutePosition.X + textSize.X
+
+	local newPosition
+	if cursorX >= clipperLeft and cursorX <= clipperRight - 2 then
+		newPosition = self.textBoxPosition:getValue()
+	elseif cursorX < clipperLeft then
+		newPosition = UDim2.new(0, -textSize.X, 0, 0)
+	else
+		newPosition = UDim2.new(0, clipper.AbsoluteSize.X - textSize.X - 2, 0, 0)
+	end
+
+	self.updateTextBoxPosition(newPosition)
 end
 
 return TextBox

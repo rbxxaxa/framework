@@ -23,6 +23,8 @@ TextDropdown.defaultProps = {
 	buttonText = "Select a choice...",
 	choiceDatas = nil,
 	choiceTexts = nil,
+
+	-- Injected by ThemeContext.connect
 	theme = nil,
 }
 
@@ -38,6 +40,7 @@ local ITextDropdown = t.interface({
 	buttonText = t.string,
 	choiceDatas = t.optional(t.table),
 	choiceTexts = t.optional(t.table),
+
 	theme = t.table,
 })
 

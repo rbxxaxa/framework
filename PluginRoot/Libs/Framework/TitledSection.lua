@@ -18,6 +18,8 @@ TitledSection.defaultProps = {
 	width = UDim.new(1, 0),
 	position = UDim2.new(),
 	layoutOrder = 0,
+	anchorPoint = Vector2.new(),
+	zIndex = 1,
 }
 
 local ITitledSection = t.interface({
@@ -25,6 +27,8 @@ local ITitledSection = t.interface({
 	width = t.UDim,
 	position = t.UDim2,
 	layoutOrder = t.integer,
+	anchorPoint = t.Vector2,
+	zIndex = t.integer,
 })
 
 TitledSection.validateProps = function(props)
@@ -41,6 +45,8 @@ function TitledSection:render()
 	local width = props.width
 	local position = props.position
 	local layoutOrder = props.layoutOrder
+	local anchorPoint = props.anchorPoint
+	local zIndex = props.zIndex
 
 	return ThemeContext.withConsumer(function(theme)
 		local colors = theme.colors
@@ -70,6 +76,8 @@ function TitledSection:render()
 				return UDim2.new(width, UDim.new(0, height + HEADER_HEIGHT + 8))
 			end),
 			LayoutOrder = layoutOrder,
+			AnchorPoint = anchorPoint,
+			ZIndex = zIndex,
 		}, {
 			Header = e("Frame", {
 				Size = UDim2.new(1, 0, 0, HEADER_HEIGHT),

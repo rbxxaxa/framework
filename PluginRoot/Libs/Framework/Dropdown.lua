@@ -19,6 +19,8 @@ Dropdown.defaultProps = {
 	size = UDim2.new(0, 100, 0, 24),
 	position = UDim2.new(),
 	layoutOrder = 0,
+	anchorPoint = Vector2.new(),
+	zIndex = 1,
 	maxRows = 6,
 	disabled = false,
 	buttonDisplay = nil,
@@ -33,6 +35,8 @@ local IDropdown = t.interface({
 	size = t.UDim2,
 	position = t.UDim2,
 	layoutOrder = t.integer,
+	anchorPoint = t.Vector2,
+	zIndex = t.integer,
 	maxRows = t.integer,
 	disabled = t.boolean,
 	buttonDisplay = t.optional(t.table),
@@ -116,6 +120,8 @@ function Dropdown:render()
 	local size = props.size
 	local position = props.position
 	local layoutOrder = props.layoutOrder
+	local anchorPoint = props.anchorPoint
+	local zIndex = props.zIndex
 	local maxRows = props.maxRows
 	local disabled = props.disabled
 	local buttonDisplay = props.buttonDisplay
@@ -271,6 +277,8 @@ function Dropdown:render()
 			Size = size,
 			Position = position,
 			LayoutOrder = layoutOrder,
+			AnchorPoint = anchorPoint,
+			ZIndex = zIndex,
 			[Roact.Change.AbsoluteSize] = function(rbx)
 				self.updateButtonAbsoluteSize(rbx.AbsoluteSize)
 			end,

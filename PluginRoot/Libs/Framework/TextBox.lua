@@ -19,6 +19,8 @@ TextBox.defaultProps = {
 	size = UDim2.new(0, 100, 0, 100),
 	position = UDim2.new(),
 	layoutOrder = 0,
+	anchorPoint = Vector2.new(),
+	zIndex = 1,
 	inputText = "",
 	placeholderText = "",
 	disabled = false,
@@ -29,6 +31,8 @@ local ITextBox = t.interface({
 	size = t.optional(t.UDim2),
 	position = t.optional(t.UDim2),
 	layoutOrder = t.integer,
+	anchorPoint = t.Vector2,
+	zIndex = t.integer,
 	inputText = t.string,
 	placeholderText = t.string,
 	disabled = t.boolean,
@@ -58,6 +62,8 @@ function TextBox:render()
 	local size = props.size
 	local position = props.position
 	local layoutOrder = props.layoutOrder
+	local anchorPoint = props.anchorPoint
+	local zIndex = props.zIndex
 	local inputText = props.inputText
 	local disabled = props.disabled
 	local focusLost = props.focusLost
@@ -73,6 +79,8 @@ function TextBox:render()
 			size = size,
 			position = position,
 			layoutOrder = layoutOrder,
+			anchorPoint = anchorPoint,
+			zIndex = zIndex,
 			buttonStateChanged = self.updateButtonState,
 			disabled = disabled,
 		}, {

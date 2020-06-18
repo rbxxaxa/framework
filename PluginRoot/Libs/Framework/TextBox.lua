@@ -13,7 +13,7 @@ local Constants = load("Framework/Constants")
 
 local e = Roact.createElement
 
-local TextBox = Roact.Component:extend("TextBox")
+local TextBox = Roact.PureComponent:extend("TextBox")
 
 TextBox.defaultProps = {
 	size = UDim2.new(0, 100, 0, 100),

@@ -9,7 +9,7 @@ local Constants = load("Framework/Constants")
 
 local e = Roact.createElement
 
-local TextDropdown = Roact.Component:extend("TextDropdown")
+local TextDropdown = Roact.PureComponent:extend("TextDropdown")
 
 TextDropdown.defaultProps = {
 	size = UDim2.new(0, 100, 0, 24),

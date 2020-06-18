@@ -8,7 +8,7 @@ local e = Roact.createElement
 
 local ModalTargetContext = Roact.createContext()
 
-local ModalTargetController = Roact.Component:extend("ModalTargetController")
+local ModalTargetController = Roact.PureComponent:extend("ModalTargetController")
 
 function ModalTargetController:init()
 	self.state = {

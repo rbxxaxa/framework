@@ -45,7 +45,7 @@ local function withConsumer(render)
 end
 
 local function connect(component, mapValueToProps)
-	local newComponent = Roact.Component:extend("ThemeContextConnected" .. tostring(component))
+	local newComponent = Roact.PureComponent:extend("ThemeContextConnected" .. tostring(component))
 
 	function newComponent:render()
 		return withConsumer(function(theme)

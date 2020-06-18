@@ -13,7 +13,7 @@ local ModalTargetContext = load("Framework/ModalTargetContext")
 
 local e = Roact.createElement
 
-local Dropdown = Roact.Component:extend("Dropdown")
+local Dropdown = Roact.PureComponent:extend("Dropdown")
 
 Dropdown.defaultProps = {
 	size = UDim2.new(0, 100, 0, 24),

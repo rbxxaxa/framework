@@ -9,7 +9,7 @@ local Constants = load("Framework/Constants")
 
 local e = Roact.createElement
 
-local TextButton = Roact.Component:extend("TextButton")
+local TextButton = Roact.PureComponent:extend("TextButton")
 
 TextButton.defaultProps = {
 	size = UDim2.new(0, 100, 0, 100),

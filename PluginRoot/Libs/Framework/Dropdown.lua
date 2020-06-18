@@ -30,6 +30,11 @@ Dropdown.defaultProps = {
 	choiceDisplays = nil,
 	openChanged = nil,
 	buttonStateChanged = nil,
+
+	-- Injected by ModalTargetContext.connect
+	modalTarget = nil,
+	-- Injected by ThemeContext.connect
+	theme = nil,
 }
 
 local IDropdown = t.strictInterface({
@@ -47,6 +52,9 @@ local IDropdown = t.strictInterface({
 	choiceDisplays = t.optional(t.table),
 	openChanged = t.optional(t.callback),
 	buttonStateChanged = t.optional(t.callback),
+
+	modalTarget = t.table,
+	theme = t.table,
 })
 
 Dropdown.validateProps = function(props)
@@ -97,6 +105,64 @@ function Dropdown:init()
 			self.props.buttonStateChanged(buttonState)
 		end
 	end
+	self.buttonBackgroundColor = self.buttonState:map(function(bs)
+		local colors = self.props.theme.colors
+
+		if self.props.disabled then
+			return colors.DropdownButtonBackground.Disabled
+		elseif self.state.open then
+			return colors.DropdownButtonBackground.Focused
+		elseif bs == "Hovered" then
+			return colors.DropdownButtonBackground.Hovered
+		else
+			return colors.DropdownButtonBackground.Default
+		end
+	end)
+	self.buttonBorderColor = self.buttonState:map(function(bs)
+		local colors = self.props.theme.colors
+
+		if self.props.disabled then
+			return colors.DropdownButtonBorder.Disabled
+		elseif self.state.open then
+			return colors.DropdownButtonBorder.Focused
+		elseif bs == "Hovered" then
+			return colors.DropdownButtonBorder.Hovered
+		else
+			return colors.DropdownButtonBorder.Default
+		end
+	end)
+	self.scrollingFrameEntrySize = self.buttonAbsoluteSize:map(function(absoluteSize)
+		return UDim2.new(1, 0, 0, absoluteSize.Y)
+	end)
+	self.dropdownSize = self.buttonAbsoluteSize:map(function(absoluteSize)
+		local numberOfChoices = self.props.choiceDatas and #self.props.choiceDatas or 0
+		return UDim2.new(0, absoluteSize.X, 0, absoluteSize.Y * math.min(self.props.maxRows, numberOfChoices))
+	end)
+	self.dropdownPosition = Roact.joinBindings({
+		buttonAbsoluteSize = self.buttonAbsoluteSize,
+		buttonAbsolutePosition = self.buttonAbsolutePosition
+	}):map(function(mapped)
+		local target = self.props.modalTarget.target
+
+		local absoluteSize, absolutePosition = mapped.buttonAbsoluteSize, mapped.buttonAbsolutePosition
+		local x = absolutePosition.X - target.AbsolutePosition.X
+		local y = absolutePosition.Y + absoluteSize.Y - target.AbsolutePosition.Y + 3
+		return UDim2.new(0, x, 0, y)
+	end)
+	self.onBackgroundCloseDetectorClicked = function()
+		self:setState({
+			open = false,
+		})
+		if self.props.openChanged then
+			self.props.openChanged(false)
+		end
+	end
+	self.onButtonAbsoluteSizeChanged = function(rbx)
+		self.updateButtonAbsoluteSize(rbx.AbsoluteSize)
+	end
+	self.onButtonAbsolutePositionChanged = function(rbx)
+		self.updateButtonAbsolutePosition(rbx.AbsolutePosition)
+	end
 end
 
 function Dropdown:didUpdate(prevProps, prevState)
@@ -131,168 +197,132 @@ function Dropdown:render()
 	local choiceDatas = props.choiceDatas
 	local choiceDisplays = props.choiceDisplays
 	local openChanged = props.openChanged
+	local modalTarget = self.props.modalTarget
+	local theme = self.props.theme
 
 	local numberOfChoices = choiceDatas and #choiceDatas or 0
+	local colors = theme.colors
 
-	return ThemeContext.withConsumer(function(theme)
-		local colors = theme.colors
+	local children = {}
+	children.DisplayBacker = e("Frame", {
+		Size = UDim2.new(1, 0, 1, 0),
+		BackgroundColor3 = self.buttonBackgroundColor,
+		BorderColor3 = self.buttonBorderColor,
+		BorderMode = Enum.BorderMode.Inset,
+	}, {
+		Display = buttonDisplay,
+	})
 
-		local children = {}
-		children.DisplayBacker = e("Frame", {
-			Size = UDim2.new(1, 0, 1, 0),
-			BackgroundColor3 = self.buttonState:map(function(bs)
-				if disabled then
-					return colors.DropdownButtonBackground.Disabled
-				elseif self.state.open then
-					return colors.DropdownButtonBackground.Focused
-				elseif bs == "Hovered" then
-					return colors.DropdownButtonBackground.Hovered
-				else
-					return colors.DropdownButtonBackground.Default
-				end
-			end),
-			BorderColor3 = self.buttonState:map(function(bs)
-				if disabled then
-					return colors.DropdownButtonBorder.Disabled
-				elseif self.state.open then
-					return colors.DropdownButtonBorder.Focused
-				elseif bs == "Hovered" then
-					return colors.DropdownButtonBorder.Hovered
-				else
-					return colors.DropdownButtonBorder.Default
-				end
-			end),
-			BorderMode = Enum.BorderMode.Inset,
-		}, {
-			Display = buttonDisplay,
-		})
-
-		local scrollingFrameChildren = {}
-		if numberOfChoices > 0 then
-			for choiceIndex = 1, numberOfChoices do
-				local choiceDisplay = choiceDisplays[choiceIndex]
-				local choiceData = choiceDatas[choiceIndex]
-				scrollingFrameChildren[choiceIndex] = e("Frame", {
-					BackgroundTransparency = 0,
-					BorderSizePixel = 0,
-					Size = self.buttonAbsoluteSize:map(function(absoluteSize) return UDim2.new(1, 0, 0, absoluteSize.Y) end),
-					LayoutOrder = choiceIndex,
-					BackgroundColor3 = self.hoveredIndex:map(function(idx)
-						if choiceIndex == idx then
-							return colors.DropdownChoiceBackground.Hovered
-						else
-							return colors.DropdownChoiceBackground.Default
-						end
-					end)
-				}, {
-					ChoiceButton = e(Button, {
-						size = UDim2.new(1, 0, 1, 0),
-						mouse1Pressed = function()
-							if choiceSelected then
-								choiceSelected(choiceIndex, choiceData)
-							end
-							self:setState({
-								open = false
-							})
-							if openChanged then
-								openChanged(false)
-							end
-							self.updateCanvasOffset(0)
-						end,
-						buttonStateChanged = function(buttonState)
-							if buttonState == "Hovered" then
-								self.updateHoveredIndex(choiceIndex)
-								if hoveredIndexChanged then
-									hoveredIndexChanged(choiceIndex)
-								end
-							elseif self.hoveredIndex:getValue() == choiceIndex then
-								self.updateHoveredIndex(0)
-								if hoveredIndexChanged then
-									hoveredIndexChanged(0)
-								end
-							end
-						end,
-					}, {
-						choiceDisplay,
-					})
-				})
-			end
-		end
-
-		-- TODO: Render the dropdown above the button if there isn't enough space below to show the whole dropdown.
-		children.DropdownEntries = self.state.open and ModalTargetContext.withConsumer(function(modalTarget)
-			return e(Roact.Portal, {
-				target = modalTarget.target,
+	local scrollingFrameChildren = {}
+	if numberOfChoices > 0 then
+		for choiceIndex = 1, numberOfChoices do
+			local choiceDisplay = choiceDisplays[choiceIndex]
+			local choiceData = choiceDatas[choiceIndex]
+			scrollingFrameChildren[choiceIndex] = e("Frame", {
+				BackgroundTransparency = 0,
+				BorderSizePixel = 0,
+				Size = self.scrollingFrameEntrySize,
+				LayoutOrder = choiceIndex,
+				BackgroundColor3 = self.hoveredIndex:map(function(idx)
+					if choiceIndex == idx then
+						return colors.DropdownChoiceBackground.Hovered
+					else
+						return colors.DropdownChoiceBackground.Default
+					end
+				end)
 			}, {
-				e("TextButton", {
-					Size = UDim2.new(1, 0, 1, 0),
-					Text = "",
-					BackgroundTransparency = 1,
-					[Roact.Event.MouseButton1Down] = function()
+				ChoiceButton = e(Button, {
+					size = UDim2.new(1, 0, 1, 0),
+					mouse1Pressed = function()
+						if choiceSelected then
+							choiceSelected(choiceIndex, choiceData)
+						end
 						self:setState({
-							open = false,
+							open = false
 						})
 						if openChanged then
 							openChanged(false)
 						end
 					end,
-				}),
-
-				e("Frame", {
-					Size = self.buttonAbsoluteSize:map(function(absoluteSize)
-						return UDim2.new(0, absoluteSize.X, 0, absoluteSize.Y * math.min(maxRows, numberOfChoices))
-					end),
-					Position = Roact.joinBindings({self.buttonAbsoluteSize, self.buttonAbsolutePosition}):map(function(joined)
-						local absoluteSize, absolutePosition = joined[1], joined[2]
-						local x = absolutePosition.X - modalTarget.target.AbsolutePosition.X
-						local y = absolutePosition.Y + absoluteSize.Y - modalTarget.target.AbsolutePosition.Y + 3
-						return UDim2.new(0, x, 0, y)
-					end),
-					BackgroundTransparency = 1,
-					ZIndex = 2,
+					buttonStateChanged = function(buttonState)
+						if buttonState == "Hovered" then
+							self.updateHoveredIndex(choiceIndex)
+							if hoveredIndexChanged then
+								hoveredIndexChanged(choiceIndex)
+							end
+						elseif self.hoveredIndex:getValue() == choiceIndex then
+							self.updateHoveredIndex(0)
+							if hoveredIndexChanged then
+								hoveredIndexChanged(0)
+							end
+						end
+					end,
 				}, {
-					e(ShadowedFrame, {
-						position = UDim2.new(0, 0, 0, 0),
-						size = UDim2.new(1, 0, 1, 0),
-					}, {
-						e(ScrollingVerticalList, {
-							size = UDim2.new(1, 0, 1, 0),
-							paddingTop = 0,
-							paddingRight = 0,
-							paddingBottom = 0,
-							paddingLeft = 0,
-							paddingList = 0,
-							contentBackgroundColor = theme.choicesBackground,
-						}, scrollingFrameChildren)
-					})
+					choiceDisplay,
 				})
 			})
-		end)
+		end
+	end
 
-
-		-- TODO: make me modal
-		return e("Frame", {
-			Size = size,
-			Position = position,
-			LayoutOrder = layoutOrder,
-			AnchorPoint = anchorPoint,
-			ZIndex = zIndex,
-			[Roact.Change.AbsoluteSize] = function(rbx)
-				self.updateButtonAbsoluteSize(rbx.AbsoluteSize)
-			end,
-			[Roact.Change.AbsolutePosition] = function(rbx)
-				self.updateButtonAbsolutePosition(rbx.AbsolutePosition)
-			end,
-			BackgroundTransparency = 1,
+	-- TODO: Render the dropdown above the button if there isn't enough space below to show the whole dropdown.
+	children.DropdownEntries = self.state.open and ModalTargetContext.withConsumer(function(modalTarget)
+		return e(Roact.Portal, {
+			target = modalTarget.target,
 		}, {
-			e(Button, {
-				size = UDim2.new(1, 0, 1, 0),
-				mouse1Pressed = self.onDropdownButtonPressed,
-				buttonStateChanged = self.onButtonStateChanged,
-				disabled = disabled,
-			}, children)
+			e("TextButton", {
+				Size = UDim2.new(1, 0, 1, 0),
+				Text = "",
+				BackgroundTransparency = 1,
+				[Roact.Event.MouseButton1Down] = self.onBackgroundCloseDetectorClicked,
+			}),
+
+			e("Frame", {
+				Size = self.dropdownSize,
+				Position = self.dropdownPosition,
+				BackgroundTransparency = 1,
+				ZIndex = 2,
+			}, {
+				e(ShadowedFrame, {
+					position = UDim2.new(0, 0, 0, 0),
+					size = UDim2.new(1, 0, 1, 0),
+				}, {
+					e(ScrollingVerticalList, {
+						size = UDim2.new(1, 0, 1, 0),
+						paddingTop = 0,
+						paddingRight = 0,
+						paddingBottom = 0,
+						paddingLeft = 0,
+						paddingList = 0,
+						contentBackgroundColor = theme.choicesBackground,
+					}, scrollingFrameChildren)
+				})
+			})
 		})
 	end)
+
+
+	-- TODO: make me modal
+	return e("Frame", {
+		Size = size,
+		Position = position,
+		LayoutOrder = layoutOrder,
+		AnchorPoint = anchorPoint,
+		ZIndex = zIndex,
+		[Roact.Change.AbsoluteSize] = self.onButtonAbsoluteSizeChanged,
+		[Roact.Change.AbsolutePosition] = self.onButtonAbsolutePositionChanged,
+		BackgroundTransparency = 1,
+	}, {
+		e(Button, {
+			size = UDim2.new(1, 0, 1, 0),
+			mouse1Pressed = self.onDropdownButtonPressed,
+			buttonStateChanged = self.onButtonStateChanged,
+			disabled = disabled,
+		}, children)
+	})
 end
 
-return Dropdown
+return ThemeContext.connect(ModalTargetContext.connect(Dropdown, function(modalTarget)
+	return {modalTarget = modalTarget}
+end), function(theme)
+	return {theme = theme}
+end)

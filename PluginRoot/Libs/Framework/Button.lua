@@ -69,8 +69,6 @@ function Button:init()
 		self:updateMouseInside(rbx, mousePos)
 	end
 	self.onInputBegan = function(rbx, inputObject)
-		self:updateMouseInside(rbx, inputObject.Position)
-
 		if self.props.disabled then return end
 		if not self.mouseInside then return end
 

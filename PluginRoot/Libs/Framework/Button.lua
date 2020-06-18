@@ -57,13 +57,13 @@ function Button:init()
 		self:updateMouseInside(rbx, inputObject.Position)
 	end
 	self.onMouseEnter = function(rbx, x, y)
-			local mousePos = Vector2.new(x, y)
-			self:updateMouseInside(rbx, mousePos)
-		end
+		local mousePos = Vector2.new(x, y)
+		self:updateMouseInside(rbx, mousePos)
+	end
 	self.onMouseMoved = function(rbx, x, y)
-			local mousePos = Vector2.new(x, y)
-			self:updateMouseInside(rbx, mousePos)
-		end
+		local mousePos = Vector2.new(x, y)
+		self:updateMouseInside(rbx, mousePos)
+	end
 	self.onMouseLeave = function(rbx, x, y)
 		local mousePos = Vector2.new(x, y)
 		self:updateMouseInside(rbx, mousePos)

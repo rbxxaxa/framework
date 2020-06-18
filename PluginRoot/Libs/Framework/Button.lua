@@ -104,9 +104,6 @@ function Button:render()
 	local layoutOrder = props.layoutOrder
 	local anchorPoint = props.anchorPoint
 	local zIndex = props.zIndex
-	local mouse1Clicked = props.mouse1Clicked
-	local mouse1Pressed = props.mouse1Pressed
-	local disabled = props.disabled
 
 	-- TODO: make me modal
 	return e("TextButton", {

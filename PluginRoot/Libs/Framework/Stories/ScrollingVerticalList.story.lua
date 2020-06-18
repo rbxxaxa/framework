@@ -16,7 +16,6 @@ return function(target)
 	local section = e(ScrollingVerticalList, {
 		size = UDim2.new(0, 200, 0, 200),
 		position = UDim2.new(0, 20, 0, 20),
-		width = UDim.new(0, 200),
 		paddingTop = 12,
 		paddingRight = 12,
 		paddingBottom = 12,

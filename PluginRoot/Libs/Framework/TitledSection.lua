@@ -20,15 +20,19 @@ TitledSection.defaultProps = {
 	layoutOrder = 0,
 	anchorPoint = Vector2.new(),
 	zIndex = 1,
+
+	[Roact.Children] = nil,
 }
 
-local ITitledSection = t.interface({
+local ITitledSection = t.strictInterface({
 	title = t.string,
 	width = t.UDim,
 	position = t.UDim2,
 	layoutOrder = t.integer,
 	anchorPoint = t.Vector2,
 	zIndex = t.integer,
+
+	[Roact.Children] = t.optional(t.table),
 })
 
 TitledSection.validateProps = function(props)

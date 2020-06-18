@@ -24,9 +24,11 @@ BorderedFrame.defaultProps = {
 	borderTransparency = 0,
 	backgroundTransparency = 0,
 	borderStyle = "Square",
+
+	[Roact.Children] = nil,
 }
 
-local IBorderedFrame = t.interface({
+local IBorderedFrame = t.strictInterface({
 	borderColor = t.Color3,
 	backgroundColor = t.Color3,
 	size = t.UDim2,
@@ -38,6 +40,8 @@ local IBorderedFrame = t.interface({
 	borderTransparency = t.numberConstrained(0, 1),
 	backgroundTransparency = t.numberConstrained(0, 1),
 	borderStyle = t.literal("Square", "Round"),
+
+	[Roact.Children] = t.optional(t.table),
 })
 
 BorderedFrame.validateProps = function(props)

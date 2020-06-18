@@ -26,7 +26,7 @@ TextButton.defaultProps = {
 	theme = nil,
 }
 
-local ITextButton = t.interface({
+local ITextButton = t.strictInterface({
 	size = t.optional(t.UDim2),
 	position = t.optional(t.UDim2),
 	layoutOrder = t.integer,

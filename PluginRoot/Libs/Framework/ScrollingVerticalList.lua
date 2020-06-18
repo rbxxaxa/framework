@@ -25,9 +25,11 @@ ScrollingVerticalList.defaultProps = {
 	paddingLeft = 4,
 	paddingList = 4,
 	contentBackgroundColor = nil,
+
+	[Roact.Children] = nil,
 }
 
-local IScrollingVerticalList = t.interface({
+local IScrollingVerticalList = t.strictInterface({
 	position = t.UDim2,
 	size = t.UDim2,
 	layoutOrder = t.integer,
@@ -39,6 +41,8 @@ local IScrollingVerticalList = t.interface({
 	paddingLeft = t.integer,
 	paddingList = t.integer,
 	contentBackgroundColor = t.optional(t.Color3),
+
+	[Roact.Children] = t.optional(t.table),
 })
 
 ScrollingVerticalList.validateProps = function(props)

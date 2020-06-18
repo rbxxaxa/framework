@@ -19,7 +19,7 @@ TextDropdownChoiceDisplay.defaultProps = {
 	theme = nil,
 }
 
-local ITextDropdownChoiceDisplay = t.interface({
+local ITextDropdownChoiceDisplay = t.strictInterface({
 	text = t.string,
 	index = t.integer,
 	hoveredIndexBinding = t.table,

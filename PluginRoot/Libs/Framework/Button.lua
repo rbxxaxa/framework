@@ -18,9 +18,11 @@ Button.defaultProps = {
 	mouse1Clicked = nil,
 	mouse1Pressed = nil,
 	disabled = false,
+
+	[Roact.Children] = nil,
 }
 
-local IButton = t.interface({
+local IButton = t.strictInterface({
 	size = t.optional(t.UDim2),
 	position = t.optional(t.UDim2),
 	layoutOrder = t.integer,
@@ -30,6 +32,8 @@ local IButton = t.interface({
 	mouse1Clicked = t.optional(t.callback),
 	mouse1Pressed = t.optional(t.callback),
 	disabled = t.boolean,
+
+	[Roact.Children] = t.optional(t.table),
 })
 
 Button.validateProps = function(props)

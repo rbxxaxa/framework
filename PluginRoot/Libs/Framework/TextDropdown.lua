@@ -29,7 +29,7 @@ TextDropdown.defaultProps = {
 	theme = nil,
 }
 
-local ITextDropdown = t.interface({
+local ITextDropdown = t.strictInterface({
 	size = t.UDim2,
 	position = t.UDim2,
 	layoutOrder = t.integer,

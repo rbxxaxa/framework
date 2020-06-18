@@ -30,7 +30,7 @@ TextBox.defaultProps = {
 	theme = nil,
 }
 
-local ITextBox = t.interface({
+local ITextBox = t.strictInterface({
 	size = t.optional(t.UDim2),
 	position = t.optional(t.UDim2),
 	layoutOrder = t.integer,

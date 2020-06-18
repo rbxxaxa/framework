@@ -21,9 +21,11 @@ ShadowedFrame.defaultProps = {
 	layoutOrder = 0,
 	zIndex = 1,
 	visible = true,
+
+	[Roact.Children] = nil,
 }
 
-local IShadowedFrame = t.interface({
+local IShadowedFrame = t.strictInterface({
 	size = t.UDim2,
 	position = t.UDim2,
 	shadowSizeOffset = t.Vector2,
@@ -32,6 +34,8 @@ local IShadowedFrame = t.interface({
 	layoutOrder = t.integer,
 	zIndex = t.integer,
 	visible = t.boolean,
+
+	[Roact.Children] = t.optional(t.table),
 })
 
 ShadowedFrame.validateProps = function(props)

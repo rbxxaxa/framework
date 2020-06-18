@@ -29,9 +29,10 @@ Dropdown.defaultProps = {
 	choiceDatas = nil,
 	choiceDisplays = nil,
 	openChanged = nil,
+	buttonStateChanged = nil,
 }
 
-local IDropdown = t.interface({
+local IDropdown = t.strictInterface({
 	size = t.UDim2,
 	position = t.UDim2,
 	layoutOrder = t.integer,
@@ -45,6 +46,7 @@ local IDropdown = t.interface({
 	choiceDatas = t.optional(t.table),
 	choiceDisplays = t.optional(t.table),
 	openChanged = t.optional(t.callback),
+	buttonStateChanged = t.optional(t.callback),
 })
 
 Dropdown.validateProps = function(props)
@@ -77,7 +79,6 @@ function Dropdown:init()
 
 	self.buttonAbsoluteSize, self.updateButtonAbsoluteSize = Roact.createBinding(Vector2.new())
 	self.buttonAbsolutePosition, self.updateButtonAbsolutePosition = Roact.createBinding(Vector2.new())
-	self.canvasOffset, self.updateCanvasOffset = Roact.createBinding(0)
 	self.hoveredIndex, self.updateHoveredIndex = Roact.createBinding(0)
 	self.onDropdownButtonPressed = function()
 		if not self.state.open then
@@ -262,9 +263,6 @@ function Dropdown:render()
 							paddingLeft = 0,
 							paddingList = 0,
 							contentBackgroundColor = theme.choicesBackground,
-							CanvasPosition = self.canvasOffset:map(function(offset)
-								return Vector2.new(0, offset)
-							end),
 						}, scrollingFrameChildren)
 					})
 				})

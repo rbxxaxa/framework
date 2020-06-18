@@ -108,7 +108,7 @@ function TextDropdown:render()
 	local position = props.position
 	local layoutOrder = props.layoutOrder
 	local anchorPoint = props.anchorPoint
-	local zindex = props.zindex
+	local zIndex = props.zindex
 	local maxRows = props.maxRows
 	local disabled = props.disabled
 	local choiceSelected = props.choiceSelected

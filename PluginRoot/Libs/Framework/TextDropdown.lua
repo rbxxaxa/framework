@@ -6,6 +6,7 @@ local t = load("t")
 local Dropdown = load("Framework/Dropdown")
 local ThemeContext = load("Framework/ThemeContext")
 local Constants = load("Framework/Constants")
+local TextDropdownChoiceDisplay = load("Framework/TextDropdownChoiceDisplay")
 
 local e = Roact.createElement
 
@@ -118,25 +119,15 @@ function TextDropdown:render()
 	local buttonText = props.buttonText
 	local choiceDatas = props.choiceDatas
 	local choiceTexts = props.choiceTexts
-	local theme = props.theme
-
-	local colors = theme.colors
 
 	local choiceDisplays = nil
 	if choiceDatas then
 		choiceDisplays = {}
 		for choiceIndex, choiceText in ipairs(choiceTexts) do
-			choiceDisplays[choiceIndex] = e("TextLabel", {
-				Size = UDim2.new(1, -16, 1, 0),
-				Position = UDim2.new(0, 8, 0, 0),
-				Text = choiceText,
-				TextXAlignment = Enum.TextXAlignment.Left,
-				BackgroundTransparency = 1,
-				TextColor3 = self.hoveredIndex:map(function(hoveredIndex)
-					return choiceIndex == hoveredIndex and colors.DropdownChoiceText.Hovered or colors.DropdownChoiceText.Default
-				end),
-				TextSize = Constants.TEXT_SIZE_DEFAULT,
-				Font = Constants.FONT_DEFAULT,
+			choiceDisplays[choiceIndex] = e(TextDropdownChoiceDisplay, {
+				text = choiceText,
+				index = choiceIndex,
+				hoveredIndexBinding = self.hoveredIndex,
 			})
 		end
 	end

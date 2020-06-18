@@ -108,7 +108,7 @@ function Button:render()
 	}, props[Roact.Children])
 end
 
-function Button:didUpdate(prevProps, pervState)
+function Button:didUpdate(prevProps, prevState)
 	if prevProps.disabled ~= self.props.disabled then
 		if self.activated then
 			self.activated = false

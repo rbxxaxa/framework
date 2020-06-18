@@ -48,6 +48,49 @@ function Button:init()
 	self.mouseInside = false
 
 	self.lastMousePos = Vector2.new(0, 0)
+
+	self.onInputChanged = function(rbx, inputObject)
+		self:updateMouseInside(rbx, inputObject.Position)
+	end
+	self.onMouseEnter = function(rbx, x, y)
+			local mousePos = Vector2.new(x, y)
+			self:updateMouseInside(rbx, mousePos)
+		end
+	self.onMouseMoved = function(rbx, x, y)
+			local mousePos = Vector2.new(x, y)
+			self:updateMouseInside(rbx, mousePos)
+		end
+	self.onMouseLeave = function(rbx, x, y)
+		local mousePos = Vector2.new(x, y)
+		self:updateMouseInside(rbx, mousePos)
+	end
+	self.onInputBegan = function(rbx, inputObject)
+		self:updateMouseInside(rbx, inputObject.Position)
+
+		if self.props.disabled then return end
+		if not self.mouseInside then return end
+
+		if inputObject.UserInputType == Enum.UserInputType.MouseButton1 then
+			self.activated = true
+			self:refreshButtonState()
+			if self.mouseInside and self.props.mouse1Pressed then
+				self.props.mouse1Pressed()
+			end
+		end
+	end
+	self.onInputEnded =function(rbx, inputObject)
+		self:updateMouseInside(rbx, inputObject.Position)
+
+		if self.props.disabled then return end
+
+		if inputObject.UserInputType == Enum.UserInputType.MouseButton1 then
+			self.activated = false
+			self:refreshButtonState()
+			if self.mouseInside and self.props.mouse1Clicked then
+				self.props.mouse1Clicked()
+			end
+		end
+	end
 end
 
 function Button:render()
@@ -71,48 +114,12 @@ function Button:render()
 		Text = "",
 		BackgroundTransparency = 1,
 		AutoButtonColor = false,
-		[Roact.Event.InputChanged] = function(rbx, inputObject)
-			self:updateMouseInside(rbx, inputObject.Position)
-		end,
-		[Roact.Event.MouseEnter] = function(rbx, x, y)
-			local mousePos = Vector2.new(x, y)
-			self:updateMouseInside(rbx, mousePos)
-		end,
-		[Roact.Event.MouseMoved] = function(rbx, x, y)
-			local mousePos = Vector2.new(x, y)
-			self:updateMouseInside(rbx, mousePos)
-		end,
-		[Roact.Event.MouseLeave] = function(rbx, x, y)
-			local mousePos = Vector2.new(x, y)
-			self:updateMouseInside(rbx, mousePos)
-		end,
-		[Roact.Event.InputBegan] = function(rbx, inputObject)
-			self:updateMouseInside(rbx, inputObject.Position)
-
-			if disabled then return end
-			if not self.mouseInside then return end
-
-			if inputObject.UserInputType == Enum.UserInputType.MouseButton1 then
-				self.activated = true
-				self:refreshButtonState()
-				if self.mouseInside and mouse1Pressed then
-					mouse1Pressed()
-				end
-			end
-		end,
-		[Roact.Event.InputEnded] = function(rbx, inputObject)
-			self:updateMouseInside(rbx, inputObject.Position)
-
-			if disabled then return end
-
-			if inputObject.UserInputType == Enum.UserInputType.MouseButton1 then
-				self.activated = false
-				self:refreshButtonState()
-				if self.mouseInside and mouse1Clicked then
-					mouse1Clicked()
-				end
-			end
-		end
+		[Roact.Event.InputChanged] = self.onInputChanged,
+		[Roact.Event.MouseEnter] = self.onMouseEnter,
+		[Roact.Event.MouseMoved] = self.onMouseMoved,
+		[Roact.Event.MouseLeave] = self.onMouseLeave,
+		[Roact.Event.InputBegan] = self.onInputBegan,
+		[Roact.Event.InputEnded] = self.onInputEnded,
 	}, props[Roact.Children])
 end
 

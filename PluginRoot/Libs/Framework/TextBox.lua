@@ -55,6 +55,60 @@ function TextBox:init()
 	})
 	self.text, self.updateText = Roact.createBinding(self.props.inputText)
 	self.textBoxPosition, self.updateTextBoxPosition = Roact.createBinding(UDim2.new())
+	self.backgroundColor = self.frameColor:map(function(mapped)
+		local colors = self.props.theme.colors
+
+		if mapped.focused then
+			return colors.InputFieldBackground.Focused
+		else
+			if self.props.disabled then
+				return colors.InputFieldBorder.Disabled
+			elseif mapped.buttonState == "Hovered" then
+				return colors.InputFieldBackground.Hovered
+			else
+				return colors.InputFieldBackground.Default
+			end
+		end
+	end)
+	self.borderColor = self.frameColor:map(function(mapped)
+		local colors = self.props.theme.colors
+
+		if mapped.focused then
+			return colors.InputFieldBorder.Focused
+		else
+			if self.props.disabled then
+				return colors.InputFieldBorder.Disabled
+			elseif mapped.buttonState == "Hovered" then
+				return colors.InputFieldBorder.Hovered
+			else
+				return colors.InputFieldBorder.Default
+			end
+		end
+	end)
+	self.font = self.text:map(function(text)
+		return text == "" and Constants.FONT_ITALIC or Constants.FONT_DEFAULT
+	end)
+	self.onCursorPositionChanged = function(rbx)
+		--[[
+			This is delayed by a frame because clipping depends on a bunch of properties
+			and these properties might be updated after CursorPosition is updated.
+		]]
+		RunService.RenderStepped:Wait()
+		self:updateClipping()
+	end
+	self.onFocusLost = function(rbx, enterPressed, inputThatCausedLostFocus)
+		local text = rbx.Text
+		if self.props.focusLost then
+			self.props.focusLost(text, enterPressed)
+		end
+		self.updateFocused(false)
+	end
+	self.onFocused = function(rbx)
+		self.updateFocused(true)
+	end
+	self.onTextChanged = function(rbx)
+		self.updateText(rbx.Text)
+	end
 end
 
 function TextBox:render()
@@ -66,123 +120,80 @@ function TextBox:render()
 	local zIndex = props.zIndex
 	local inputText = props.inputText
 	local disabled = props.disabled
-	local focusLost = props.focusLost
 	local placeholderText = props.placeholderText
+	local theme = self.props.theme
 
+	local colors = theme.colors
+
+	--[[
+		If the text box is disabled, then updateText will never get called.
+		We do that here, otherwise the font of the text will never change.
+	]]
 	self.updateText(inputText)
 
-	return ThemeContext.withConsumer(function(theme)
-		local colors = theme.colors
-
-		-- TODO: make me modal
-		return e(Button, {
-			size = size,
-			position = position,
-			layoutOrder = layoutOrder,
-			anchorPoint = anchorPoint,
-			zIndex = zIndex,
-			buttonStateChanged = self.updateButtonState,
-			disabled = disabled,
+	-- TODO: make me modal
+	return e(Button, {
+		size = size,
+		position = position,
+		layoutOrder = layoutOrder,
+		anchorPoint = anchorPoint,
+		zIndex = zIndex,
+		buttonStateChanged = self.updateButtonState,
+		disabled = disabled,
+	}, {
+		Background = e("Frame", {
+			Size = UDim2.new(1, 0, 1, 0),
+			BorderSizePixel = 1,
+			BackgroundColor3 = self.backgroundColor,
+			BorderColor3 = self.borderColor,
+			BorderMode = Enum.BorderMode.Inset,
+		}),
+		-- We fudge some offsets/paddings by -1 so that the cursor will always get rendered in the box.
+		Clipper = e("Frame", {
+			Size = UDim2.new(1, -15, 1, 0),
+			Position = UDim2.new(0, 7, 0, 0),
+			BackgroundTransparency = 1,
+			ClipsDescendants = true,
+			[Roact.Ref] = self.clipperRef,
+			ZIndex = 2,
 		}, {
-			Background = e("Frame", {
-				Size = UDim2.new(1, 0, 1, 0),
-				BorderSizePixel = 1,
-				BackgroundColor3 = self.frameColor:map(function(mapped)
-					if mapped.focused then
-						return colors.InputFieldBackground.Focused
-					else
-						if disabled then
-							return colors.InputFieldBorder.Disabled
-						elseif mapped.buttonState == "Hovered" then
-							return colors.InputFieldBackground.Hovered
-						else
-							return colors.InputFieldBackground.Default
-						end
-					end
-				end),
-				BorderColor3 = self.frameColor:map(function(mapped)
-					if mapped.focused then
-						return colors.InputFieldBorder.Focused
-					else
-						if disabled then
-							return colors.InputFieldBorder.Disabled
-						elseif mapped.buttonState == "Hovered" then
-							return colors.InputFieldBorder.Hovered
-						else
-							return colors.InputFieldBorder.Default
-						end
-					end
-				end),
-				BorderMode = Enum.BorderMode.Inset,
+			Padding = e("UIPadding", {
+				PaddingLeft = UDim.new(0, 1),
 			}),
-			-- We fudge some offsets/paddings by -1 so that the cursor will always get rendered in the box.
-			Clipper = e("Frame", {
-				Size = UDim2.new(1, -15, 1, 0),
-				Position = UDim2.new(0, 7, 0, 0),
+
+			TextLabel = disabled and e("TextLabel", {
+				Text = inputText == "" and placeholderText or inputText,
 				BackgroundTransparency = 1,
-				ClipsDescendants = true,
-				[Roact.Ref] = self.clipperRef,
-				ZIndex = 2,
-			}, {
-				Padding = e("UIPadding", {
-					PaddingLeft = UDim.new(0, 1),
-				}),
-
-				TextLabel = disabled and e("TextLabel", {
-					Text = inputText == "" and placeholderText or inputText,
-					BackgroundTransparency = 1,
-					TextWrapped = false,
-					Size = UDim2.new(0, 9999, 1, 0),
-					TextXAlignment = Enum.TextXAlignment.Left,
-					Position = UDim2.new(0, 0, 0, 0),
-					TextColor3 = colors.MainText.Disabled,
-					Font = self.text:map(function(text)
-						return text == "" and Constants.FONT_ITALIC or Constants.FONT_DEFAULT
-					end),
-					TextSize = Constants.TEXT_SIZE_DEFAULT,
-				}),
-
-				TextBox = not disabled and e("TextBox", {
-					Text = inputText,
-					BackgroundTransparency = 1,
-					TextWrapped = false,
-					ClearTextOnFocus = false,
-					PlaceholderText = placeholderText,
-					Size = UDim2.new(0, 9999, 1, 0),
-					TextXAlignment = Enum.TextXAlignment.Left,
-					Position = self.textBoxPosition,
-					TextColor3 = colors.MainText.Default,
-					PlaceholderColor3 = colors.DimmedText.Default,
-					Font = self.text:map(function(text)
-						return text == "" and Constants.FONT_ITALIC or Constants.FONT_DEFAULT
-					end),
-					TextSize = Constants.TEXT_SIZE_DEFAULT,
-					[Roact.Change.CursorPosition] = function(rbx)
-						--[[
-							This is delayed by a frame because clipping depends on a bunch of properties
-							and these properties might be updated after CursorPosition is updated.
-						]]
-						RunService.RenderStepped:Wait()
-						self:updateClipping()
-					end,
-					[Roact.Ref] = self.textBoxRef,
-					[Roact.Event.FocusLost] = function(rbx, enterPressed, inputThatCausedLostFocus)
-						local text = rbx.Text
-						if focusLost then
-							focusLost(text, enterPressed)
-						end
-						self.updateFocused(false)
-					end,
-					[Roact.Event.Focused] = function(rbx)
-						self.updateFocused(true)
-					end,
-					[Roact.Change.Text] = function(rbx)
-						self.updateText(rbx.Text)
-					end
-				}),
+				TextWrapped = false,
+				Size = UDim2.new(0, 9999, 1, 0),
+				TextXAlignment = Enum.TextXAlignment.Left,
+				Position = UDim2.new(0, 0, 0, 0),
+				TextColor3 = colors.MainText.Disabled,
+				Font = self.font,
+				TextSize = Constants.TEXT_SIZE_DEFAULT,
 			}),
-		})
-	end)
+
+			TextBox = not disabled and e("TextBox", {
+				Text = inputText,
+				BackgroundTransparency = 1,
+				TextWrapped = false,
+				ClearTextOnFocus = false,
+				PlaceholderText = placeholderText,
+				Size = UDim2.new(0, 9999, 1, 0),
+				TextXAlignment = Enum.TextXAlignment.Left,
+				Position = self.textBoxPosition,
+				TextColor3 = colors.MainText.Default,
+				PlaceholderColor3 = colors.DimmedText.Default,
+				Font = self.font,
+				TextSize = Constants.TEXT_SIZE_DEFAULT,
+				[Roact.Change.CursorPosition] = self.onCursorPositionChanged,
+				[Roact.Ref] = self.textBoxRef,
+				[Roact.Event.FocusLost] = self.onFocusLost,
+				[Roact.Event.Focused] = self.onFocused,
+				[Roact.Change.Text] = self.onTextChanged,
+			}),
+		}),
+	})
 end
 
 function TextBox:updateClipping()
@@ -212,5 +223,6 @@ function TextBox:updateClipping()
 	self.updateTextBoxPosition(newPosition)
 end
 
-return TextBox
-
+return ThemeContext.connect(TextBox, function(theme)
+	return {theme = theme}
+end)

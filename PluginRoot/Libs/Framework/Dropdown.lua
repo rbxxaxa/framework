@@ -99,7 +99,7 @@ function Dropdown:didUpdate(prevProps, prevState)
 		-- Can't set state here... so we have to wait a frame.
 		-- A little hacky, but this shouldn't be that bad.
 		-- TODO: Revisit this at some point.
-		RunService.Heartbeat:Wait()
+		RunService.RenderStepped:Wait()
 		self:setState({
 			open = false,
 		})

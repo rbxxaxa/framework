@@ -46,32 +46,29 @@ end
 
 function TextButton:init()
 	self.buttonState, self.updateButtonState = Roact.createBinding("Default")
-	self.textColor = self.buttonState:map(function(buttonState)
-		local colors = self.props.theme.colors
-
-		if self.props.disabled then
-			return colors.ButtonText.Disabled
+	self.disabled, self.updateDisabled = Roact.createBinding(self.props.disabled)
+	local buttonAppearance = Roact.joinBindings({
+		disabled = self.disabled,
+		buttonState = self.buttonState,
+	}):map(function(mapped)
+		if mapped.disabled then
+			return "Disabled"
 		else
-			return colors.ButtonText[buttonState]
+			return mapped.buttonState
 		end
 	end)
-	self.backgroundColor = self.buttonState:map(function(buttonState)
-		local colors = self.props.theme.colors
 
-		if self.props.disabled then
-			return colors.Button.Disabled
-		else
-			return colors.Button[buttonState]
-		end
+	self.textColor = buttonAppearance:map(function(appearance)
+		local colors = self.props.theme.colors
+		return colors.ButtonText[appearance]
 	end)
-	self.borderColor = self.buttonState:map(function(buttonState)
+	self.backgroundColor = buttonAppearance:map(function(appearance)
 		local colors = self.props.theme.colors
-
-		if self.props.disabled then
-			return colors.ButtonBorder.Disabled
-		else
-			return colors.ButtonBorder[buttonState]
-		end
+		return colors.Button[appearance]
+	end)
+	self.borderColor = buttonAppearance:map(function(appearance)
+		local colors = self.props.theme.colors
+		return colors.ButtonBorder[appearance]
 	end)
 end
 
@@ -86,6 +83,8 @@ function TextButton:render()
 	local mouse1Clicked = props.mouse1Clicked
 	local mouse1Pressed = props.mouse1Pressed
 	local disabled = props.disabled
+
+	self.updateDisabled(disabled)
 
 	-- TODO: make me modal
 	return e(Button, {

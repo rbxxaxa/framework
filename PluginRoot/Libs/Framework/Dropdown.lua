@@ -102,7 +102,7 @@ function Dropdown:init()
 			self.props.buttonStateChanged(buttonState)
 		end
 	end
-	self.buttonColorState = Roact.joinBindings({
+	self.buttonAppearanceState = Roact.joinBindings({
 		open = self.open,
 		buttonState = self.buttonState,
 		disabled = self.disabled,
@@ -117,11 +117,11 @@ function Dropdown:init()
 			return "Default"
 		end
 	end)
-	self.buttonBackgroundColor = self.buttonColorState:map(function(colorState)
+	self.buttonBackgroundColor = self.buttonAppearanceState:map(function(colorState)
 		local colors = self.props.theme.colors
 		return colors.DropdownButtonBackground[colorState]
 	end)
-	self.buttonBorderColor = self.buttonColorState:map(function(colorState)
+	self.buttonBorderColor = self.buttonAppearanceState:map(function(colorState)
 		local colors = self.props.theme.colors
 		return colors.DropdownButtonBorder[colorState]
 	end)

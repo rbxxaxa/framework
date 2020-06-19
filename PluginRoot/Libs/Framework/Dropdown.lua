@@ -89,19 +89,8 @@ function Dropdown:init()
 	self.buttonAbsolutePosition, self.updateButtonAbsolutePosition = Roact.createBinding(Vector2.new())
 	self.hoveredIndex, self.updateHoveredIndex = Roact.createBinding(0)
 	self.disabled, self.updateDisabled = Roact.createBinding(self.props.disabled)
-	self.onDropdownButtonPressed = function()
-		if not self.state.open then
-			self:setOpen(true)
-		end
-	end
 	self.buttonState, self.updateButtonState = Roact.createBinding("Default")
 	self.open, self.updateOpen = Roact.createBinding(false)
-	self.onButtonStateChanged = function(buttonState)
-		self.updateButtonState(buttonState)
-		if self.props.buttonStateChanged then
-			self.props.buttonStateChanged(buttonState)
-		end
-	end
 	self.buttonAppearanceState = Roact.joinBindings({
 		open = self.open,
 		buttonState = self.buttonState,
@@ -144,6 +133,17 @@ function Dropdown:init()
 		return UDim2.new(0, x, 0, y)
 	end)
 
+	self.onButtonStateChanged = function(buttonState)
+		self.updateButtonState(buttonState)
+		if self.props.buttonStateChanged then
+			self.props.buttonStateChanged(buttonState)
+		end
+	end
+	self.onDropdownButtonPressed = function()
+		if not self.state.open then
+			self:setOpen(true)
+		end
+	end
 	self.onBackgroundCloseDetectorClicked = function()
 		self:setOpen(false)
 	end

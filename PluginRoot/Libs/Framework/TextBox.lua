@@ -130,12 +130,6 @@ function TextBox:render()
 
 	local colors = theme.colors
 
-	--[[
-		If the text box is disabled, then updateText will never get called.
-		We do that here, otherwise the font of the text will never change.
-	]]
-	self.updateText(inputText)
-
 	-- TODO: make me modal
 	return e(Button, {
 		size = size,
@@ -198,6 +192,14 @@ function TextBox:render()
 			}),
 		}),
 	})
+end
+
+function TextBox:didUpdate()
+	--[[
+		If the text box is disabled, then onTextChange (which calls updateText) will never get called.
+		We do that here, otherwise the font of the text will never change.
+	]]
+	self.updateText(self.props.inputText)
 end
 
 function TextBox:updateClipping()

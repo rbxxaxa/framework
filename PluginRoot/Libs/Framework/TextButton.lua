@@ -84,8 +84,6 @@ function TextButton:render()
 	local mouse1Pressed = props.mouse1Pressed
 	local disabled = props.disabled
 
-	self.updateDisabled(disabled)
-
 	-- TODO: make me modal
 	return e(Button, {
 		size = size,
@@ -114,6 +112,10 @@ function TextButton:render()
 			ZIndex = 2,
 		})
 	})
+end
+
+function TextButton:didUpdate()
+	self.updateDisabled(self.props.disabled)
 end
 
 return ThemeContext.connect(TextButton, function(theme)

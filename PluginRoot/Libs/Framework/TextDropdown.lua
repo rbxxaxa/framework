@@ -70,38 +70,32 @@ end
 function TextDropdown:init()
 	self.hoveredIndex, self.updateHoveredIndex = Roact.createBinding(0)
 	self.buttonState, self.updateButtonState = Roact.createBinding("Default")
+	self.disabled, self.updateDisabled = Roact.createBinding(self.props.disabled)
 	self.open, self.updateOpen = Roact.createBinding(false)
-	self.arrowColor = Roact.joinBindings({
+	self.appearanceState = Roact.joinBindings({
 		buttonState = self.buttonState,
 		open = self.open,
-	}):map(function(values)
-		local colors = self.props.theme.colors
-
-		if self.props.disabled then
-			return colors.DropdownArrow.Disabled
-		elseif values.open then
-			return colors.DropdownArrow.Focused
-		elseif values.buttonState == "Hovered" then
-			return colors.DropdownArrow.Hovered
+		disabled = self.disabled,
+	}):map(function(mapped)
+		if mapped.disabled then
+			return "Disabled"
+		elseif mapped.open then
+			return "Focused"
+		elseif mapped.buttonState == "Hovered" then
+			return "Hovered"
 		else
-			return colors.DropdownArrow.Default
+			return "Default"
 		end
 	end)
-	self.buttonTextColor = Roact.joinBindings({
-		buttonState = self.buttonState,
-		open = self.open,
-	}):map(function(values)
-		local colors = self.props.theme.colors
 
-		if self.props.disabled then
-			return colors.DropdownButtonText.Disabled
-		elseif values.open then
-			return colors.DropdownButtonText.Focused
-		elseif values.buttonState == "Hovered" then
-			return colors.DropdownButtonText.Hovered
-		else
-			return colors.DropdownButtonText.Default
-		end
+	self.arrowColor = self.appearanceState:map(function(appearanceState)
+		local colors = self.props.theme.colors
+		return colors.DropdownArrow[appearanceState]
+	end)
+
+	self.buttonTextColor = self.appearanceState:map(function(appearanceState)
+		local colors = self.props.theme.colors
+		return colors.DropdownButtonText[appearanceState]
 	end)
 end
 
@@ -166,6 +160,10 @@ function TextDropdown:render()
 		choiceDisplays = choiceDisplays,
 		buttonStateChanged = self.updateButtonState,
 	})
+end
+
+function TextDropdown:didUpdate()
+	self.updateDisabled(self.props.disabled)
 end
 
 return ThemeContext.connect(TextDropdown, function(theme)

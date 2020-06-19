@@ -3,6 +3,7 @@ local load = require(PluginRoot.Loader).load
 
 local Roact = load("Roact")
 local TextButton = load("Framework/TextButton")
+local TextDropdown = load("Framework/TextDropdown")
 local StoryWrapper = load("Stories/StoryWrapper")
 
 local e = Roact.createElement
@@ -12,6 +13,7 @@ local DisabledTestingStory = Roact.Component:extend("DisabledTestingStory")
 function DisabledTestingStory:init()
 	self.state = {
 		enabledButton = 1,
+		enabledDropdown = 1,
 	}
 end
 
@@ -52,6 +54,48 @@ function DisabledTestingStory:render()
 				})
 			end
 		}),
+
+		e(TextDropdown, {
+			size = UDim2.new(0, 100, 0, 24),
+			position = UDim2.new(0, 100, 0, 20),
+			buttonText = self.state.enabledDropdown ~= 1 and "Disabled" or "Enabled",
+			choiceTexts = {"1", "2", "3"},
+			choiceDatas = {1, 2, 3},
+			disabled = self.state.enabledDropdown ~= 1,
+			choiceSelected = function(_, data)
+				self:setState({
+					enabledDropdown = data,
+				})
+			end
+		}),
+
+		e(TextDropdown, {
+			size = UDim2.new(0, 100, 0, 24),
+			position = UDim2.new(0, 200, 0, 20),
+			buttonText = self.state.enabledDropdown ~= 2 and "Disabled" or "Enabled",
+			choiceTexts = {"1", "2", "3"},
+			choiceDatas = {1, 2, 3},
+			disabled = self.state.enabledDropdown ~= 2,
+			choiceSelected = function(_, data)
+				self:setState({
+					enabledDropdown = data,
+				})
+			end
+		}),
+
+		e(TextDropdown, {
+			size = UDim2.new(0, 100, 0, 24),
+			position = UDim2.new(0, 300, 0, 20),
+			buttonText = self.state.enabledDropdown ~= 3 and "Disabled" or "Enabled",
+			choiceTexts = {"1", "2", "3"},
+			choiceDatas = {1, 2, 3},
+			disabled = self.state.enabledDropdown ~= 3,
+			choiceSelected = function(_, data)
+				self:setState({
+					enabledDropdown = data,
+				})
+			end
+		})
 	})
 end
 

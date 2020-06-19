@@ -88,6 +88,7 @@ function Dropdown:init()
 	self.buttonAbsoluteSize, self.updateButtonAbsoluteSize = Roact.createBinding(Vector2.new())
 	self.buttonAbsolutePosition, self.updateButtonAbsolutePosition = Roact.createBinding(Vector2.new())
 	self.hoveredIndex, self.updateHoveredIndex = Roact.createBinding(0)
+	self.disabled, self.updateDisabled = Roact.createBinding(self.props.disabled)
 	self.onDropdownButtonPressed = function()
 		if not self.state.open then
 			self:setOpen(true)
@@ -104,8 +105,9 @@ function Dropdown:init()
 	self.buttonColorState = Roact.joinBindings({
 		open = self.open,
 		buttonState = self.buttonState,
+		disabled = self.disabled,
 	}):map(function(mapped)
-		if self.props.disabled then
+		if mapped.disabled then
 			return "Disabled"
 		elseif mapped.open then
 			return "Focused"
@@ -141,6 +143,7 @@ function Dropdown:init()
 		local y = absolutePosition.Y + absoluteSize.Y - target.AbsolutePosition.Y + 3
 		return UDim2.new(0, x, 0, y)
 	end)
+
 	self.onBackgroundCloseDetectorClicked = function()
 		self:setOpen(false)
 	end
@@ -181,8 +184,9 @@ function Dropdown:init()
 end
 
 function Dropdown:didUpdate(prevProps, prevState)
+	self.updateDisabled(self.props.disabled)
 	if prevProps.disabled ~= self.props.disabled then
-		if self.props.disabled then
+		if self.props.disabled and self.state.open then
 			-- Can't set state here... so we have to wait a frame.
 			-- A little hacky, but this shouldn't be that bad.
 			-- TODO: Revisit this at some point.

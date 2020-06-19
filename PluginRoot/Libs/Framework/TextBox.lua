@@ -54,41 +54,31 @@ function TextBox:init()
 
 	self.focused, self.updateFocused = Roact.createBinding(false)
 	self.buttonState, self.updateButtonState = Roact.createBinding("Default")
-	self.frameColor = Roact.joinBindings({
-		buttonState = self.buttonState,
-		focused = self.focused,
-	})
 	self.text, self.updateText = Roact.createBinding(self.props.inputText)
 	self.textBoxPosition, self.updateTextBoxPosition = Roact.createBinding(UDim2.new())
-	self.backgroundColor = self.frameColor:map(function(mapped)
-		local colors = self.props.theme.colors
-
-		if mapped.focused then
-			return colors.InputFieldBackground.Focused
+	self.disabled, self.updateDisabled = Roact.createBinding(self.props.disabled)
+	self.appearanceState = Roact.joinBindings({
+		disabled = self.disabled,
+		buttonState = self.buttonState,
+		focused = self.focused,
+	}):map(function(mapped)
+		if mapped.disabled then
+			return "Disabled"
+		elseif mapped.focused then
+			return "Focused"
+		elseif mapped.buttonState == "Hovered" then
+			return "Hovered"
 		else
-			if self.props.disabled then
-				return colors.InputFieldBorder.Disabled
-			elseif mapped.buttonState == "Hovered" then
-				return colors.InputFieldBackground.Hovered
-			else
-				return colors.InputFieldBackground.Default
-			end
+			return "Default"
 		end
 	end)
-	self.borderColor = self.frameColor:map(function(mapped)
+	self.backgroundColor = self.appearanceState:map(function(appearanceState)
 		local colors = self.props.theme.colors
-
-		if mapped.focused then
-			return colors.InputFieldBorder.Focused
-		else
-			if self.props.disabled then
-				return colors.InputFieldBorder.Disabled
-			elseif mapped.buttonState == "Hovered" then
-				return colors.InputFieldBorder.Hovered
-			else
-				return colors.InputFieldBorder.Default
-			end
-		end
+		return colors.InputFieldBackground[appearanceState]
+	end)
+	self.borderColor = self.appearanceState:map(function(appearanceState)
+		local colors = self.props.theme.colors
+		return colors.InputFieldBorder[appearanceState]
 	end)
 	self.font = self.text:map(function(text)
 		return text == "" and Constants.FONT_ITALIC or Constants.FONT_DEFAULT
@@ -97,6 +87,8 @@ function TextBox:init()
 		--[[
 			This is delayed by a frame because clipping depends on a bunch of properties
 			and these properties might be updated after CursorPosition is updated.
+
+			In my testing, this delay makes no visual difference.
 		]]
 		RunService.RenderStepped:Wait()
 		self:updateClipping()
@@ -160,7 +152,7 @@ function TextBox:render()
 			}),
 
 			TextLabel = disabled and e("TextLabel", {
-				Text = inputText == "" and placeholderText or inputText,
+				Text = self.text:getValue() == "" and placeholderText or self.text,
 				BackgroundTransparency = 1,
 				TextWrapped = false,
 				Size = UDim2.new(0, 9999, 1, 0),
@@ -171,8 +163,9 @@ function TextBox:render()
 				TextSize = Constants.TEXT_SIZE_DEFAULT,
 			}),
 
-			TextBox = not disabled and e("TextBox", {
-				Text = inputText,
+			TextBox = e("TextBox", {
+				Text = self.text,
+				Visible = disabled == false,
 				BackgroundTransparency = 1,
 				TextWrapped = false,
 				ClearTextOnFocus = false,
@@ -194,12 +187,18 @@ function TextBox:render()
 	})
 end
 
-function TextBox:didUpdate()
+function TextBox:didUpdate(prevProps, prevState)
 	--[[
 		If the text box is disabled, then onTextChange (which calls updateText) will never get called.
 		We do that here, otherwise the font of the text will never change.
 	]]
 	self.updateText(self.props.inputText)
+	self.updateDisabled(self.props.disabled)
+	if self.props.disabled ~= prevProps.disabled then
+		if self.props.disabled then
+			self.textBoxRef:getValue():ReleaseFocus()
+		end
+	end
 end
 
 function TextBox:updateClipping()
@@ -207,7 +206,8 @@ function TextBox:updateClipping()
 	local textBox = self.textBoxRef:getValue()
 
 	if textBox.CursorPosition < 0 then
-		return UDim2.new(0, 0, 0, 0)
+		self.updateTextBoxPosition(UDim2.new(0, 0, 0, 0))
+		return
 	end
 
 	local textUpToCursor = string.sub(textBox.Text, 1, textBox.CursorPosition-1)

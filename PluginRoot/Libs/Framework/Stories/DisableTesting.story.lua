@@ -4,6 +4,7 @@ local load = require(PluginRoot.Loader).load
 local Roact = load("Roact")
 local TextButton = load("Framework/TextButton")
 local TextDropdown = load("Framework/TextDropdown")
+local TextBox = load("Framework/TextBox")
 local StoryWrapper = load("Stories/StoryWrapper")
 
 local e = Roact.createElement
@@ -95,7 +96,28 @@ function DisabledTestingStory:render()
 					enabledDropdown = data,
 				})
 			end
-		})
+		}),
+
+		e(TextBox, {
+			size = UDim2.new(0, 100, 0, 24),
+			position = UDim2.new(0, 100, 0, 72),
+			inputText = "Test",
+			disabled = self.state.enabledButton ~= 1,
+		}),
+
+		e(TextBox, {
+			size = UDim2.new(0, 100, 0, 24),
+			position = UDim2.new(0, 200, 0, 72),
+			inputText = "Test",
+			disabled = self.state.enabledButton ~= 2,
+		}),
+
+		e(TextBox, {
+			size = UDim2.new(0, 100, 0, 24),
+			position = UDim2.new(0, 300, 0, 72),
+			inputText = "Test",
+			disabled = self.state.enabledButton ~= 3,
+		}),
 	})
 end
 

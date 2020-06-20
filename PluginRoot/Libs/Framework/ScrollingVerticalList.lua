@@ -70,24 +70,6 @@ function ScrollingVerticalList:render()
 	return ThemeContext.withConsumer(function(theme)
 		local colors = theme.colors
 
-		local children = props[Roact.Children] ~= nil and Oyrc.Dictionary.join(props[Roact.Children], {
-			ScrollingVerticalListUIListLayout = e("UIListLayout", {
-				SortOrder = Enum.SortOrder.LayoutOrder,
-				Padding = UDim.new(0, paddingList),
-				[Roact.Change.AbsoluteContentSize] = function(rbx)
-					local contentHeight = rbx.AbsoluteContentSize.Y
-					self.updateContentHeight(contentHeight)
-				end,
-			}),
-
-			ScrollingVerticalListUIPadding = e("UIPadding", {
-				PaddingTop = UDim.new(0, paddingTop),
-				PaddingRight = UDim.new(0, paddingRight + SCROLL_BAR_THICKNESS),
-				PaddingBottom = UDim.new(0, paddingBottom),
-				PaddingLeft = UDim.new(0, paddingLeft),
-			})
-		}) or nil
-
 		-- TODO: Use modal to disable scrolling when necessary
 		return e("Frame", {
 			BackgroundTransparency = 1,
@@ -125,7 +107,27 @@ function ScrollingVerticalList:render()
 				BottomImage = "rbxassetid://2245002518",
 				MidImage = "rbxassetid://2245002518",
 				ScrollBarImageColor3 = colors.ScrollBar.Default,
-			}, children)
+			}, {
+				Roact.createFragment({
+					ScrollingVerticalListUIListLayout = e("UIListLayout", {
+						SortOrder = Enum.SortOrder.LayoutOrder,
+						Padding = UDim.new(0, paddingList),
+						[Roact.Change.AbsoluteContentSize] = function(rbx)
+							local contentHeight = rbx.AbsoluteContentSize.Y
+							self.updateContentHeight(contentHeight)
+						end,
+					}),
+
+					ScrollingVerticalListUIPadding = e("UIPadding", {
+						PaddingTop = UDim.new(0, paddingTop),
+						PaddingRight = UDim.new(0, paddingRight + SCROLL_BAR_THICKNESS),
+						PaddingBottom = UDim.new(0, paddingBottom),
+						PaddingLeft = UDim.new(0, paddingLeft),
+					}),
+
+					self.props[Roact.Children] and Roact.createFragment(self.props[Roact.Children]) or nil,
+				})
+			})
 		})
 	end)
 end

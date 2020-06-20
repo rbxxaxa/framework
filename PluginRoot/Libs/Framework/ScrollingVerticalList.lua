@@ -51,6 +51,11 @@ end
 
 function ScrollingVerticalList:init()
 	self.contentHeight, self.updateContentHeight = Roact.createBinding(0)
+
+	self.onAbsoluteContentSizeChanged = function(rbx)
+		local contentHeight = rbx.AbsoluteContentSize.Y
+		self.updateContentHeight(contentHeight)
+	end
 end
 
 function ScrollingVerticalList:render()
@@ -112,10 +117,7 @@ function ScrollingVerticalList:render()
 					ScrollingVerticalListUIListLayout = e("UIListLayout", {
 						SortOrder = Enum.SortOrder.LayoutOrder,
 						Padding = UDim.new(0, paddingList),
-						[Roact.Change.AbsoluteContentSize] = function(rbx)
-							local contentHeight = rbx.AbsoluteContentSize.Y
-							self.updateContentHeight(contentHeight)
-						end,
+						[Roact.Change.AbsoluteContentSize] = self.onAbsoluteContentSizeChanged,
 					}),
 
 					ScrollingVerticalListUIPadding = e("UIPadding", {

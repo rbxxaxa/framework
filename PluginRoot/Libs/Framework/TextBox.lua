@@ -26,6 +26,7 @@ TextBox.defaultProps = {
 	placeholderText = "",
 	disabled = false,
 	focusLost = nil,
+	textXAlignment = "Left",
 
 	theme = nil, -- Injected by ThemeContext.connect
 }
@@ -40,6 +41,7 @@ local ITextBox = t.strictInterface({
 	placeholderText = t.string,
 	disabled = t.boolean,
 	focusLost = t.optional(t.callback),
+	textXAlignment = t.literal("Left", "Center", "Right"),
 
 	theme = t.table,
 })
@@ -57,6 +59,7 @@ function TextBox:init()
 	self.text, self.updateText = Roact.createBinding(self.props.inputText)
 	self.textBoxPosition, self.updateTextBoxPosition = Roact.createBinding(UDim2.new())
 	self.disabled, self.updateDisabled = Roact.createBinding(self.props.disabled)
+	self.placeholderText, self.updatePlaceholderText = Roact.createBinding(self.props.placeholderText)
 	self.appearanceState = Roact.joinBindings({
 		disabled = self.disabled,
 		buttonState = self.buttonState,
@@ -70,6 +73,16 @@ function TextBox:init()
 			return "Hovered"
 		else
 			return "Default"
+		end
+	end)
+	self.textInTextLabel = Roact.joinBindings({
+		placeholderText = self.placeholderText,
+		text = self.text,
+	}):map(function(mapped)
+		if mapped.text == "" then
+			return mapped.placeholderText
+		else
+			return mapped.text
 		end
 	end)
 	self.backgroundColor = self.appearanceState:map(function(appearanceState)
@@ -115,9 +128,9 @@ function TextBox:render()
 	local layoutOrder = props.layoutOrder
 	local anchorPoint = props.anchorPoint
 	local zIndex = props.zIndex
-	local inputText = props.inputText
 	local disabled = props.disabled
 	local placeholderText = props.placeholderText
+	local textXAlignment = props.textXAlignment
 	local theme = self.props.theme
 
 	local colors = theme.colors
@@ -140,8 +153,8 @@ function TextBox:render()
 		}),
 		-- We fudge some offsets/paddings by -1 so that the cursor will always get rendered in the box.
 		Clipper = e("Frame", {
-			Size = UDim2.new(1, -15, 1, 0),
-			Position = UDim2.new(0, 7, 0, 0),
+			Size = UDim2.new(1, -14, 1, 0),
+			Position = UDim2.new(0, 6, 0, 0),
 			BackgroundTransparency = 1,
 			ClipsDescendants = true,
 			[Roact.Ref] = self.clipperRef,
@@ -149,14 +162,15 @@ function TextBox:render()
 		}, {
 			Padding = e("UIPadding", {
 				PaddingLeft = UDim.new(0, 1),
+				PaddingRight = UDim.new(0, 1),
 			}),
 
 			TextLabel = disabled and e("TextLabel", {
-				Text = self.text:getValue() == "" and placeholderText or self.text,
+				Text = self.textInTextLabel,
 				BackgroundTransparency = 1,
 				TextWrapped = false,
-				Size = UDim2.new(0, 9999, 1, 0),
-				TextXAlignment = Enum.TextXAlignment.Left,
+				Size = UDim2.new(1, 0, 1, 0),
+				TextXAlignment = Enum.TextXAlignment[textXAlignment],
 				Position = UDim2.new(0, 0, 0, 0),
 				TextColor3 = colors.MainText.Disabled,
 				Font = self.font,
@@ -170,8 +184,8 @@ function TextBox:render()
 				TextWrapped = false,
 				ClearTextOnFocus = false,
 				PlaceholderText = placeholderText,
-				Size = UDim2.new(0, 9999, 1, 0),
-				TextXAlignment = Enum.TextXAlignment.Left,
+				Size = UDim2.new(1, 0, 1, 0),
+				TextXAlignment = Enum.TextXAlignment[textXAlignment],
 				Position = self.textBoxPosition,
 				TextColor3 = colors.MainText.Default,
 				PlaceholderColor3 = colors.DimmedText.Default,
@@ -199,31 +213,35 @@ function TextBox:didUpdate(prevProps, prevState)
 			self.textBoxRef:getValue():ReleaseFocus()
 		end
 	end
+	self.updatePlaceholderText(self.props.placeholderText)
 end
 
 function TextBox:updateClipping()
 	local clipper = self.clipperRef:getValue()
 	local textBox = self.textBoxRef:getValue()
 
-	if textBox.CursorPosition < 0 then
-		self.updateTextBoxPosition(UDim2.new(0, 0, 0, 0))
-		return
-	end
-
-	local textUpToCursor = string.sub(textBox.Text, 1, textBox.CursorPosition-1)
-	local textSize = TextService:GetTextSize(textUpToCursor, Constants.TEXT_SIZE_DEFAULT,
-		Constants.FONT_DEFAULT, Vector2.new(9999, 9999))
-	local clipperLeft = clipper.AbsolutePosition.X
-	local clipperRight = clipper.AbsolutePosition.X + clipper.AbsoluteSize.X
-	local cursorX = textBox.AbsolutePosition.X + textSize.X
-
 	local newPosition
-	if cursorX >= clipperLeft and cursorX <= clipperRight - 2 then
-		newPosition = self.textBoxPosition:getValue()
-	elseif cursorX < clipperLeft then
-		newPosition = UDim2.new(0, -textSize.X, 0, 0)
+	if self.props.textXAlignment == "Left" then
+		if textBox.CursorPosition < 0 then
+			newPosition = UDim2.new(0, 0, 0, 0)
+		else
+			local textUpToCursor = string.sub(textBox.Text, 1, textBox.CursorPosition-1)
+			local textSize = TextService:GetTextSize(textUpToCursor, Constants.TEXT_SIZE_DEFAULT,
+				Constants.FONT_DEFAULT, Vector2.new(9999, 9999))
+			local clipperLeft = clipper.AbsolutePosition.X
+			local clipperRight = clipper.AbsolutePosition.X + clipper.AbsoluteSize.X
+			local cursorX = textBox.AbsolutePosition.X + textSize.X
+
+			if cursorX >= clipperLeft and cursorX <= clipperRight - 2 then
+				newPosition = self.textBoxPosition:getValue()
+			elseif cursorX < clipperLeft then
+				newPosition = UDim2.new(0, -textSize.X, 0, 0)
+			else
+				newPosition = UDim2.new(0, clipper.AbsoluteSize.X - textSize.X - 2, 0, 0)
+			end
+		end
 	else
-		newPosition = UDim2.new(0, clipper.AbsoluteSize.X - textSize.X - 2, 0, 0)
+		newPosition = UDim2.new(0, 0, 0, 0)
 	end
 
 	self.updateTextBoxPosition(newPosition)

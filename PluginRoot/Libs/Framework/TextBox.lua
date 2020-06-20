@@ -241,6 +241,8 @@ function TextBox:updateClipping()
 			end
 		end
 	else
+		-- Clipping not implemented for center- (is it even possible) and right-aligned text.
+		-- TODO: Revisit this, possibly.
 		newPosition = UDim2.new(0, 0, 0, 0)
 	end
 

@@ -126,7 +126,7 @@ function ScrollingVerticalList:render()
 						PaddingLeft = UDim.new(0, paddingLeft),
 					}),
 
-					self.props[Roact.Children] and Roact.createFragment(self.props[Roact.Children]) or nil,
+					props[Roact.Children] and Roact.createFragment(props[Roact.Children]) or nil,
 				})
 			})
 		})

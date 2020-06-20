@@ -5,7 +5,7 @@ local RunService = game:GetService("RunService")
 
 local Roact = load("Roact")
 local t = load("t")
-local Button = load("Framework/Button")
+local ButtonDetector = load("Framework/ButtonDetector")
 local ScrollingVerticalList = load("Framework/ScrollingVerticalList")
 local ShadowedFrame = load("Framework/ShadowedFrame")
 local ThemeContext = load("Framework/ThemeContext")
@@ -281,7 +281,7 @@ function Dropdown:render()
 		[Roact.Change.AbsolutePosition] = self.onButtonAbsolutePositionChanged,
 		BackgroundTransparency = 1,
 	}, {
-		e(Button, {
+		e(ButtonDetector, {
 			size = UDim2.new(1, 0, 1, 0),
 			mouse1Pressed = self.onDropdownButtonPressed,
 			buttonStateChanged = self.onButtonStateChanged,

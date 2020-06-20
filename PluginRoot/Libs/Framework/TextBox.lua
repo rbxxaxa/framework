@@ -7,7 +7,7 @@ local TextService = game:GetService("TextService")
 
 local Roact = load("Roact")
 local t = load("t")
-local Button = load("Framework/Button")
+local ButtonDetector = load("Framework/ButtonDetector")
 local ThemeContext = load("Framework/ThemeContext")
 local Constants = load("Framework/Constants")
 local BorderedFrame = load("Framework/BorderedFrame")
@@ -123,7 +123,7 @@ function TextBox:render()
 	local colors = theme.colors
 
 	-- TODO: make me modal
-	return e(Button, {
+	return e(ButtonDetector, {
 		size = size,
 		position = position,
 		layoutOrder = layoutOrder,

@@ -2,7 +2,7 @@ local PluginRoot = script:FindFirstAncestor("PluginRoot")
 local load = require(PluginRoot.Loader).load
 
 local Roact = load("Roact")
-local Button = load("Framework/Button")
+local ButtonDetector = load("Framework/ButtonDetector")
 local StoryWrapper = load("Stories/StoryWrapper")
 
 local e = Roact.createElement
@@ -17,7 +17,7 @@ return function(target)
 	local clickCount, updateClickCount = Roact.createBinding(0)
 	local buttonState, updateButtonState = Roact.createBinding("Default")
 
-	local button  = e(Button, {
+	local button  = e(ButtonDetector, {
 		size = UDim2.new(0, 100, 0, 100),
 		position = UDim2.new(0, 100, 0, 100),
 		mouse1Pressed = function()

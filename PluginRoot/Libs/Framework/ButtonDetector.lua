@@ -6,9 +6,9 @@ local t = load("t")
 
 local e = Roact.createElement
 
-local Button = Roact.Component:extend("Button")
+local ButtonDetector = Roact.Component:extend("ButtonDetector")
 
-Button.defaultProps = {
+ButtonDetector.defaultProps = {
 	size = UDim2.new(0, 100, 0, 100),
 	position = UDim2.new(),
 	layoutOrder = 0,
@@ -22,7 +22,7 @@ Button.defaultProps = {
 	[Roact.Children] = nil,
 }
 
-local IButton = t.strictInterface({
+local IButtonDetector = t.strictInterface({
 	size = t.optional(t.UDim2),
 	position = t.optional(t.UDim2),
 	layoutOrder = t.integer,
@@ -36,8 +36,8 @@ local IButton = t.strictInterface({
 	[Roact.Children] = t.optional(t.table),
 })
 
-Button.validateProps = function(props)
-	return IButton(props)
+ButtonDetector.validateProps = function(props)
+	return IButtonDetector(props)
 end
 
 local function isMouseInside(frame, mousePos)
@@ -47,7 +47,7 @@ local function isMouseInside(frame, mousePos)
 	return x >= topLeft.X and y >= topLeft.Y and x <= bottomRight.X and y <= bottomRight.Y
 end
 
-function Button:init()
+function ButtonDetector:init()
 	self.activated = false
 	self.mouseInside = false
 
@@ -95,7 +95,7 @@ function Button:init()
 	end
 end
 
-function Button:render()
+function ButtonDetector:render()
 	local props = self.props
 	local size = props.size
 	local position = props.position
@@ -122,7 +122,7 @@ function Button:render()
 	}, props[Roact.Children])
 end
 
-function Button:didUpdate(prevProps, prevState)
+function ButtonDetector:didUpdate(prevProps, prevState)
 	if prevProps.disabled ~= self.props.disabled then
 		if self.activated then
 			self.activated = false
@@ -131,7 +131,7 @@ function Button:didUpdate(prevProps, prevState)
 	end
 end
 
-function Button:updateMouseInside(frame, mousePos)
+function ButtonDetector:updateMouseInside(frame, mousePos)
 	local mouseInside = isMouseInside(frame, mousePos)
 	if mouseInside ~= self.mouseInside then
 		self.mouseInside = mouseInside
@@ -139,7 +139,7 @@ function Button:updateMouseInside(frame, mousePos)
 	end
 end
 
-function Button:refreshButtonState()
+function ButtonDetector:refreshButtonState()
 	local newState
 	if self.activated and self.mouseInside then
 		newState = "PressedIn"
@@ -159,4 +159,4 @@ function Button:refreshButtonState()
 	end
 end
 
-return Button
+return ButtonDetector

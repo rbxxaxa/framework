@@ -4,7 +4,7 @@ local load = require(PluginRoot.Loader).load
 local Roact = load("Roact")
 local t = load("t")
 local ThemeContext = load("Framework/ThemeContext")
-local Button = load("Framework/Button")
+local ButtonDetector = load("Framework/ButtonDetector")
 
 local e = Roact.createElement
 
@@ -66,7 +66,7 @@ function DropdownChoiceButton:render()
 		LayoutOrder = index,
 		BackgroundColor3 = self.backgroundColor,
 	}, {
-		ChoiceButton = e(Button, {
+		ChoiceButton = e(ButtonDetector, {
 			size = UDim2.new(1, 0, 1, 0),
 			mouse1Pressed = self.onChoicePressed,
 			buttonStateChanged = self.onButtonStateChanged,

@@ -3,7 +3,7 @@ local load = require(PluginRoot.Loader).load
 
 local Roact = load("Roact")
 local t = load("t")
-local Button = load("Framework/Button")
+local ButtonDetector = load("Framework/ButtonDetector")
 local ThemeContext = load("Framework/ThemeContext")
 local Constants = load("Framework/Constants")
 local BorderedFrame = load("Framework/BorderedFrame")
@@ -85,7 +85,7 @@ function TextButton:render()
 	local disabled = props.disabled
 
 	-- TODO: make me modal
-	return e(Button, {
+	return e(ButtonDetector, {
 		size = size,
 		position = position,
 		layoutOrder = layoutOrder,

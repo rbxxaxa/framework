@@ -3,7 +3,6 @@ local load = require(PluginRoot.Loader).load
 
 local Roact = load("Roact")
 local t = load("t")
-local Oyrc = load("Oyrc")
 local ThemeContext = load("Framework/ThemeContext")
 local Constants = load("Framework/Constants")
 
@@ -55,24 +54,6 @@ function TitledSection:render()
 	return ThemeContext.withConsumer(function(theme)
 		local colors = theme.colors
 
-		local children = props[Roact.Children] ~= nil and Oyrc.Dictionary.join(props[Roact.Children], {
-			TitledSectionUIListLayout = e("UIListLayout", {
-				SortOrder = Enum.SortOrder.LayoutOrder,
-				Padding = UDim.new(0, 4),
-				[Roact.Change.AbsoluteContentSize] = function(rbx)
-					local contentHeight = rbx.AbsoluteContentSize.Y
-					self.updateContentHeight(contentHeight)
-				end,
-			}),
-
-			TitledSectionUIPadding = e("UIPadding", {
-				PaddingTop = UDim.new(0, 4),
-				PaddingRight = UDim.new(0, 4),
-				PaddingBottom = UDim.new(0, 4),
-				PaddingLeft = UDim.new(0, 4),
-			})
-		}) or nil
-
 		return e("Frame", {
 			BackgroundTransparency = 1,
 			Position = position,
@@ -106,7 +87,27 @@ function TitledSection:render()
 				Size = UDim2.new(1, 0, 1, -HEADER_HEIGHT),
 				Position = UDim2.new(0, 0, 0, HEADER_HEIGHT),
 				BorderSizePixel = 0,
-			}, children)
+			}, {
+				Roact.createFragment({
+					TitledSectionUIListLayout = e("UIListLayout", {
+						SortOrder = Enum.SortOrder.LayoutOrder,
+						Padding = UDim.new(0, 4),
+						[Roact.Change.AbsoluteContentSize] = function(rbx)
+							local contentHeight = rbx.AbsoluteContentSize.Y
+							self.updateContentHeight(contentHeight)
+						end,
+					}),
+
+					TitledSectionUIPadding = e("UIPadding", {
+						PaddingTop = UDim.new(0, 4),
+						PaddingRight = UDim.new(0, 4),
+						PaddingBottom = UDim.new(0, 4),
+						PaddingLeft = UDim.new(0, 4),
+					}),
+
+					props[Roact.Children] and Roact.createFragment(props[Roact.Children]) or nil,
+				})
+			}),
 		})
 	end)
 end

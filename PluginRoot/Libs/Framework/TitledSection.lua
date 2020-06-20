@@ -40,12 +40,23 @@ end
 
 function TitledSection:init()
 	self.contentHeight, self.updateContentHeight = Roact.createBinding(0)
+	self.width, self.updateWidth = Roact.createBinding(self.props.width)
+	self.size = Roact.joinBindings({
+		contentHeight = self.contentHeight,
+		width = self.width,
+	}):map(function(mapped)
+		return UDim2.new(mapped.width, UDim.new(0, mapped.contentHeight + HEADER_HEIGHT + 8))
+	end)
+
+	self.onAbsoluteContentSizeChanged = function(rbx)
+		local contentHeight = rbx.AbsoluteContentSize.Y
+		self.updateContentHeight(contentHeight)
+	end
 end
 
 function TitledSection:render()
 	local props = self.props
 	local title = props.title
-	local width = props.width
 	local position = props.position
 	local layoutOrder = props.layoutOrder
 	local anchorPoint = props.anchorPoint
@@ -57,9 +68,7 @@ function TitledSection:render()
 		return e("Frame", {
 			BackgroundTransparency = 1,
 			Position = position,
-			Size = self.contentHeight:map(function(height)
-				return UDim2.new(width, UDim.new(0, height + HEADER_HEIGHT + 8))
-			end),
+			Size = self.size,
 			LayoutOrder = layoutOrder,
 			AnchorPoint = anchorPoint,
 			ZIndex = zIndex,
@@ -92,10 +101,7 @@ function TitledSection:render()
 					TitledSectionUIListLayout = e("UIListLayout", {
 						SortOrder = Enum.SortOrder.LayoutOrder,
 						Padding = UDim.new(0, 4),
-						[Roact.Change.AbsoluteContentSize] = function(rbx)
-							local contentHeight = rbx.AbsoluteContentSize.Y
-							self.updateContentHeight(contentHeight)
-						end,
+						[Roact.Change.AbsoluteContentSize] = self.onAbsoluteContentSizeChanged,
 					}),
 
 					TitledSectionUIPadding = e("UIPadding", {
@@ -110,6 +116,10 @@ function TitledSection:render()
 			}),
 		})
 	end)
+end
+
+function TitledSection:didUpdate()
+	self.updateWidth(self.props.width)
 end
 
 return TitledSection

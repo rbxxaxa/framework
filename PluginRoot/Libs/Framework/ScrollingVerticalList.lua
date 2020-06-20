@@ -3,7 +3,6 @@ local load = require(PluginRoot.Loader).load
 
 local Roact = load("Roact")
 local t = load("t")
-local Oyrc = load("Oyrc")
 local ThemeContext = load("Framework/ThemeContext")
 
 local e = Roact.createElement

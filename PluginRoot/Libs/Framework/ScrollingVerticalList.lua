@@ -50,11 +50,21 @@ end
 
 function ScrollingVerticalList:init()
 	self.contentHeight, self.updateContentHeight = Roact.createBinding(0)
+	self.paddingTop, self.updatePaddingTop = Roact.createBinding(self.props.paddingTop)
+	self.paddingBottom, self.updatePaddingBottom = Roact.createBinding(self.props.paddingBottom)
 
 	self.onAbsoluteContentSizeChanged = function(rbx)
 		local contentHeight = rbx.AbsoluteContentSize.Y
 		self.updateContentHeight(contentHeight)
 	end
+
+	self.canvasSize = Roact.joinBindings({
+		contentHeight = self.contentHeight,
+		paddingTop = self.paddingTop,
+		paddingBottom = self.paddingBottom,
+	}):map(function(mapped)
+		return UDim2.new(1, 0, 0, mapped.contentHeight + mapped.paddingTop + mapped.paddingBottom)
+	end)
 end
 
 function ScrollingVerticalList:render()
@@ -104,9 +114,7 @@ function ScrollingVerticalList:render()
 				VerticalScrollBarInset = Enum.ScrollBarInset.Always,
 				ScrollingDirection = Enum.ScrollingDirection.Y,
 				ScrollBarThickness = SCROLL_BAR_THICKNESS,
-				CanvasSize = self.contentHeight:map(function(height)
-					return UDim2.new(1, 0, 0, height + paddingTop + paddingBottom)
-				end),
+				CanvasSize = self.canvasSize,
 				TopImage = "rbxassetid://2245002518",
 				BottomImage = "rbxassetid://2245002518",
 				MidImage = "rbxassetid://2245002518",
@@ -131,6 +139,11 @@ function ScrollingVerticalList:render()
 			})
 		})
 	end)
+end
+
+function ScrollingVerticalList:didUpdate()
+	self.updatePaddingBottom(self.props.paddingBottom)
+	self.updatePaddingTop(self.props.paddingTop)
 end
 
 return ScrollingVerticalList

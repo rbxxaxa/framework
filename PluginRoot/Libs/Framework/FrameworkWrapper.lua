@@ -5,7 +5,7 @@ local Roact = load("Roact")
 local ThemeContext = load("Framework/ThemeContext")
 local ModalTargetContext = load("Framework/ModalTargetContext")
 
-local FrameworkWrapper = Roact.PureComponent:extend("FrameworkWrapper")
+local FrameworkWrapper = Roact.Component:extend("FrameworkWrapper")
 
 function FrameworkWrapper:render()
 	local props = self.props

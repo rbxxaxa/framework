@@ -12,18 +12,20 @@ local ModalTargetContext = Roact.createContext()
 local ModalTargetController = Roact.Component:extend("ModalTargetController")
 
 function ModalTargetController:init()
+	local modalTarget = self.props.modalTarget
 	self.state = {
-		modalTarget = self.props.modalTarget,
+		modalTarget = modalTarget,
 	}
-	self.maid = Maid.new()
-end
 
-function ModalTargetController:didMount()
+	self.absoluteSize, self.updateAbsoluteSize = Roact.createBinding(modalTarget.AbsoluteSize)
+	self.absolutePosition, self.updateAbsolutePosition = Roact.createBinding(modalTarget.AbsolutePosition)
+
+	self.maid = Maid.new()
 	self.maid:GiveTask(self.state.modalTarget:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
-		self:setState({})
+		self.updateAbsoluteSize(self.state.modalTarget.AbsoluteSize)
 	end))
 	self.maid:GiveTask(self.state.modalTarget:GetPropertyChangedSignal("AbsolutePosition"):Connect(function()
-		self:setState({})
+		self.updateAbsolutePosition(self.state.modalTarget.AbsolutePosition)
 	end))
 end
 
@@ -31,6 +33,8 @@ function ModalTargetController:render()
 	return e(ModalTargetContext.Provider, {
 		value = {
 			target = self.state.modalTarget,
+			absolutePositionBinding = self.absolutePosition,
+			absoluteSizeBinding = self.absoluteSize,
 		},
 	}, self.props[Roact.Children])
 end

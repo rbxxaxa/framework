@@ -25,9 +25,9 @@ TextBox.defaultProps = {
 	inputText = "",
 	placeholderText = "",
 	disabled = false,
+	focused = nil,
 	focusLost = nil,
 	textXAlignment = "Left",
-	focusChanged = nil,
 
 	theme = nil, -- Injected by ThemeContext.connect
 }
@@ -41,9 +41,9 @@ local ITextBox = t.strictInterface({
 	inputText = t.string,
 	placeholderText = t.string,
 	disabled = t.boolean,
+	focused = t.optional(t.callback),
 	focusLost = t.optional(t.callback),
 	textXAlignment = t.literal("Left", "Center", "Right"),
-	focusChanged = t.optional(t.callback),
 
 	theme = t.table,
 })
@@ -119,6 +119,13 @@ function TextBox:init()
 		self:setFocused(false)
 	end
 	self.onFocused = function(rbx)
+		local text = rbx.Text
+		if self.props.focused then
+			local replacementText = self.props.focused(text)
+			if replacementText then
+				self.updateText(replacementText)
+			end
+		end
 		self:setFocused(true)
 	end
 	self.onTextChanged = function(rbx)
@@ -256,9 +263,6 @@ end
 
 function TextBox:setFocused(focused)
 	self.updateFocused(focused)
-	if self.props.focusChanged then
-		self.props.focusChanged(focused)
-	end
 end
 
 return ThemeContext.connect(TextBox, function(theme)

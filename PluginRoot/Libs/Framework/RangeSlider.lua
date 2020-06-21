@@ -25,6 +25,8 @@ RangeSlider.defaultProps = {
 	min = 0,
 	max = 1,
 	value = 0.5,
+	displayRounding = 2,
+	editRounding = 2,
 	step = nil,
 	disabled = false,
 	valueChanged = nil,
@@ -42,6 +44,8 @@ local IRangeSlider = t.strictInterface({
 	min = t.number,
 	max = t.number,
 	value = t.number,
+	displayRounding = t.integer,
+	editRounding = t.integer,
 	step = t.optional(t.number),
 	disabled = t.boolean,
 	valueChanged = t.optional(t.callback),
@@ -58,6 +62,14 @@ RangeSlider.validateProps = function(props)
 
 	if props.min >= props.max then
 		return false, "max should be greater than min."
+	end
+
+	if props.displayRounding < 0 then
+		return false, "displayRounding only supports positive values."
+	end
+
+	if props.editRounding < 0 then
+		return false, "editRounding only supports positive values."
 	end
 
 	return true
@@ -83,11 +95,6 @@ function RangeSlider:init()
 	end
 	self.onAbsolutePositionChanged = function(rbx)
 		self.updateAbsolutePosition(rbx.AbsolutePosition)
-	end
-	self.onTextBoxFocusChanged = function(focused)
-		if focused and not self.state.open then
-			self:setOpen(true)
-		end
 	end
 	self.onBackgroundCloseDetectorClicked = function()
 		self:setOpen(false)
@@ -129,19 +136,36 @@ function RangeSlider:init()
 			end
 		end
 	end
+
+	self.valueToEdit = function(value)
+		return tostring(round(value, 1 * 10^(-self.props.editRounding)))
+	end
+
+	self.valueToDisplay = function(value)
+		return tostring(round(value, 1 * 10^(-self.props.displayRounding)))
+	end
+
+	self.onTextBoxFocused = function(text)
+		if not self.state.open then
+			self:setOpen(true)
+			local editText = self.valueToEdit(self.props.value)
+			return editText
+		end
+	end
 	self.onTextBoxFocusLost = function(text)
 		local newValue = tonumber(text)
 		if newValue == nil then
-			return tostring(self.props.value)
+			return self.valueToDisplay(self.props.value)
 		end
 
 		newValue = math.clamp(newValue, self.props.min, self.props.max)
 		if newValue == self.props.value then
-			return tostring(self.props.value)
+			return self.valueToDisplay(self.props.value)
 		end
 
 		if self.props.valueChanged then
 			self.props.valueChanged(newValue)
+			return self.valueToDisplay(newValue)
 		end
 	end
 
@@ -263,9 +287,9 @@ function RangeSlider:render()
 		}, {
 			TextBox = e(TextBox, {
 				size = UDim2.new(1, 0, 1, 0),
-				focusChanged = self.onTextBoxFocusChanged,
 				disabled = disabled,
-				inputText = tostring(value),
+				inputText = self.valueToDisplay(self.props.value),
+				focused = self.onTextBoxFocused,
 				focusLost = self.onTextBoxFocusLost,
 			}),
 

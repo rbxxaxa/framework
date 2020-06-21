@@ -15,6 +15,8 @@ ButtonDetector.defaultProps = {
 	anchorPoint = Vector2.new(),
 	zIndex = 1,
 	buttonStateChanged = nil,
+	mouseInsideChanged = nil,
+	activatedChanged = nil,
 	mouse1Clicked = nil,
 	mouse1Pressed = nil,
 	disabled = false,
@@ -29,6 +31,8 @@ local IButtonDetector = t.strictInterface({
 	anchorPoint = t.Vector2,
 	zIndex = t.integer,
 	buttonStateChanged = t.optional(t.callback),
+	mouseInsideChanged = t.optional(t.callback),
+	activatedChanged = t.optional(t.callback),
 	mouse1Clicked = t.optional(t.callback),
 	mouse1Pressed = t.optional(t.callback),
 	disabled = t.boolean,
@@ -73,8 +77,7 @@ function ButtonDetector:init()
 		if not self.mouseInside then return end
 
 		if inputObject.UserInputType == Enum.UserInputType.MouseButton1 then
-			self.activated = true
-			self:refreshButtonState()
+			self:setActivated(true)
 			if self.mouseInside and self.props.mouse1Pressed then
 				self.props.mouse1Pressed()
 			end
@@ -86,8 +89,7 @@ function ButtonDetector:init()
 		if self.props.disabled then return end
 
 		if inputObject.UserInputType == Enum.UserInputType.MouseButton1 then
-			self.activated = false
-			self:refreshButtonState()
+			self:setActivated(false)
 			if self.mouseInside and self.props.mouse1Clicked then
 				self.props.mouse1Clicked()
 			end
@@ -122,20 +124,34 @@ function ButtonDetector:render()
 	}, props[Roact.Children])
 end
 
-function ButtonDetector:didUpdate(prevProps, prevState)
-	if prevProps.disabled ~= self.props.disabled then
-		if self.activated then
-			self.activated = false
-			self:refreshButtonState()
+function ButtonDetector:updateMouseInside(frame, mousePos)
+	local mouseInside = isMouseInside(frame, mousePos)
+	self:setMouseInside(mouseInside)
+end
+
+function ButtonDetector:setActivated(activated)
+	if self.activated ~= activated then
+		self.activated = activated
+		if self.props.activatedChanged then
+			self.props.activatedChanged(activated)
 		end
+		self:refreshButtonState()
 	end
 end
 
-function ButtonDetector:updateMouseInside(frame, mousePos)
-	local mouseInside = isMouseInside(frame, mousePos)
-	if mouseInside ~= self.mouseInside then
+function ButtonDetector:setMouseInside(mouseInside)
+	if self.mouseInside ~= mouseInside then
 		self.mouseInside = mouseInside
+		if self.props.mouseInsideChanged then
+			self.props.mouseInsideChanged(mouseInside)
+		end
 		self:refreshButtonState()
+	end
+end
+
+function ButtonDetector:didUpdate(prevProps, prevState)
+	if prevProps.disabled ~= self.props.disabled then
+		self:setActivated(false)
 	end
 end
 

@@ -25,8 +25,8 @@ RangeSlider.defaultProps = {
 	min = 0,
 	max = 1,
 	value = 0.5,
-	displayRounding = 2,
-	editRounding = 2,
+	displayRound = 2,
+	editRound = 2,
 	step = nil,
 	disabled = false,
 	valueChanged = nil,
@@ -44,8 +44,8 @@ local IRangeSlider = t.strictInterface({
 	min = t.number,
 	max = t.number,
 	value = t.number,
-	displayRounding = t.integer,
-	editRounding = t.integer,
+	displayRound = t.integer,
+	editRound = t.integer,
 	step = t.optional(t.number),
 	disabled = t.boolean,
 	valueChanged = t.optional(t.callback),
@@ -64,12 +64,12 @@ RangeSlider.validateProps = function(props)
 		return false, "max should be greater than min."
 	end
 
-	if props.displayRounding < 0 then
-		return false, "displayRounding only supports positive values."
+	if props.displayRound < 0 then
+		return false, "displayRound only supports positive values."
 	end
 
-	if props.editRounding < 0 then
-		return false, "editRounding only supports positive values."
+	if props.editRound < 0 then
+		return false, "editRound only supports positive values."
 	end
 
 	return true
@@ -137,35 +137,35 @@ function RangeSlider:init()
 		end
 	end
 
-	self.valueToEdit = function(value)
-		return tostring(round(value, 1 * 10^(-self.props.editRounding)))
+	self.valueToEditText = function(value)
+		return tostring(round(value, 1 * 10^(-self.props.editRound)))
 	end
 
-	self.valueToDisplay = function(value)
-		return tostring(round(value, 1 * 10^(-self.props.displayRounding)))
+	self.valueToDisplayText = function(value)
+		return tostring(round(value, 1 * 10^(-self.props.displayRound)))
 	end
 
 	self.onTextBoxFocused = function(text)
 		if not self.state.open then
 			self:setOpen(true)
-			local editText = self.valueToEdit(self.props.value)
+			local editText = self.valueToEditText(self.props.value)
 			return editText
 		end
 	end
 	self.onTextBoxFocusLost = function(text)
 		local newValue = tonumber(text)
 		if newValue == nil then
-			return self.valueToDisplay(self.props.value)
+			return self.valueToDisplayText(self.props.value)
 		end
 
 		newValue = math.clamp(newValue, self.props.min, self.props.max)
 		if newValue == self.props.value then
-			return self.valueToDisplay(self.props.value)
+			return self.valueToDisplayText(self.props.value)
 		end
 
 		if self.props.valueChanged then
 			self.props.valueChanged(newValue)
-			return self.valueToDisplay(newValue)
+			return self.valueToDisplayText(newValue)
 		end
 	end
 
@@ -266,7 +266,6 @@ function RangeSlider:render()
 	local layoutOrder = props.layoutOrder
 	local anchorPoint = props.anchorPoint
 	local zIndex = props.zIndex
-	local value = props.value
 	local disabled = props.disabled
 	local modalTarget = props.modalTarget
 	local theme = props.theme
@@ -288,7 +287,7 @@ function RangeSlider:render()
 			TextBox = e(TextBox, {
 				size = UDim2.new(1, 0, 1, 0),
 				disabled = disabled,
-				inputText = self.valueToDisplay(self.props.value),
+				inputText = self.valueToDisplayText(self.props.value),
 				focused = self.onTextBoxFocused,
 				focusLost = self.onTextBoxFocusLost,
 			}),

@@ -27,8 +27,8 @@ function RangeSliderStory:render()
 		value = self.state.value,
 		min = -5,
 		max = 5,
-		editRounding = 6,
-		displayRounding = 2,
+		editRound = 6,
+		displayRound = 2,
 	})
 
 	local rangeSliderDisabled = e(RangeSlider, {

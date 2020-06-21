@@ -127,6 +127,8 @@ function TextBox:init()
 			end
 		end
 		self:setFocused(true)
+		rbx.CursorPosition = #rbx.Text + 1
+		rbx.SelectionStart = 1
 	end
 	self.onTextChanged = function(rbx)
 		self.updateText(rbx.Text)

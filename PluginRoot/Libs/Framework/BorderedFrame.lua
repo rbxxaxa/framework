@@ -61,12 +61,12 @@ function BorderedFrame:render()
 	local backgroundColorBinding = props.backgroundColorBinding
 	local size = props.size
 	local position = props.position
-	local anchorPoint = props.AnchorPoint
-	local layoutOrder = props.LayoutOrder
-	local zIndex = props.ZIndex
-	local visible = props.Visible
+	local anchorPoint = props.anchorPoint
+	local layoutOrder = props.layoutOrder
+	local zIndex = props.zIndex
+	local visible = props.visible
 	local borderTransparency = props.borderTransparency
-	local backgroundTransparency = props.BackgroundTransparency
+	local backgroundTransparency = props.backgroundTransparency
 	local borderStyle = props.borderStyle
 
 	local borderImage, fillImage

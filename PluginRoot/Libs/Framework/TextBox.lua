@@ -109,6 +109,7 @@ function TextBox:init()
 		self:updateClipping()
 	end
 	self.onFocusLost = function(rbx, enterPressed, inputThatCausedLostFocus)
+		self.updateFocused(false)
 		local text = rbx.Text
 		if self.props.focusLost then
 			local replacementText = self.props.focusLost(text, enterPressed)
@@ -116,9 +117,9 @@ function TextBox:init()
 				self.updateText(replacementText)
 			end
 		end
-		self:setFocused(false)
 	end
 	self.onFocused = function(rbx)
+		self.updateFocused(true)
 		local text = rbx.Text
 		if self.props.focused then
 			local replacementText = self.props.focused(text)
@@ -126,7 +127,6 @@ function TextBox:init()
 				self.updateText(replacementText)
 			end
 		end
-		self:setFocused(true)
 		rbx.CursorPosition = #rbx.Text + 1
 		rbx.SelectionStart = 1
 	end
@@ -263,10 +263,6 @@ function TextBox:updateClipping()
 	end
 
 	self.updateTextBoxPosition(newPosition)
-end
-
-function TextBox:setFocused(focused)
-	self.updateFocused(focused)
 end
 
 return ThemeContext.connect(TextBox, function(theme)

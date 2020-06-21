@@ -102,6 +102,12 @@ function Theme.new()
 			Focused = c(53, 53, 53),
 			Disabled = c(53, 53, 53),
 		},
+		SliderBarBackground = {
+			Default = c(255, 255, 255),
+		},
+		SliderBarFill = {
+			Default = c(51, 181, 255),
+		},
 	}
 
 	return setmetatable(self, Theme)

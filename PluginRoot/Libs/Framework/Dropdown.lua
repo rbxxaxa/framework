@@ -123,13 +123,12 @@ function Dropdown:init()
 	end)
 	self.dropdownPosition = Roact.joinBindings({
 		buttonAbsoluteSize = self.buttonAbsoluteSize,
-		buttonAbsolutePosition = self.buttonAbsolutePosition
+		buttonAbsolutePosition = self.buttonAbsolutePosition,
+		targetAbsolutePosition = self.props.modalTarget.absolutePositionBinding,
 	}):map(function(mapped)
-		local target = self.props.modalTarget.target
-
 		local absoluteSize, absolutePosition = mapped.buttonAbsoluteSize, mapped.buttonAbsolutePosition
-		local x = absolutePosition.X - target.AbsolutePosition.X
-		local y = absolutePosition.Y + absoluteSize.Y - target.AbsolutePosition.Y + 3
+		local x = absolutePosition.X - mapped.targetAbsolutePosition.X
+		local y = absolutePosition.Y + absoluteSize.Y - mapped.targetAbsolutePosition.Y + 3
 		return UDim2.new(0, x, 0, y)
 	end)
 

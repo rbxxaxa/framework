@@ -220,7 +220,9 @@ function TextBox:didUpdate(prevProps, prevState)
 		If the text box is disabled, then onTextChange (which calls updateText) will never get called.
 		We do that here, otherwise the font of the text will never change.
 	]]
-	self.updateText(self.props.inputText)
+	if not self.focused:getValue() then
+		self.updateText(self.props.inputText)
+	end
 	self.updateDisabled(self.props.disabled)
 	if self.props.disabled ~= prevProps.disabled then
 		if self.props.disabled then

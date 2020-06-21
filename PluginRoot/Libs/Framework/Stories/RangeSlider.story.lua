@@ -34,6 +34,9 @@ function RangeSliderStory:render()
 	local rangeSliderDisabled = e(RangeSlider, {
 		size = UDim2.new(0, 200, 0, 24),
 		position = UDim2.new(0, 100, 0, 130),
+		value = self.state.value,
+		min = -5,
+		max = 5,
 		disabled = true
 	})
 

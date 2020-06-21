@@ -27,6 +27,7 @@ TextBox.defaultProps = {
 	disabled = false,
 	focusLost = nil,
 	textXAlignment = "Left",
+	focusChanged = nil,
 
 	theme = nil, -- Injected by ThemeContext.connect
 }
@@ -42,6 +43,7 @@ local ITextBox = t.strictInterface({
 	disabled = t.boolean,
 	focusLost = t.optional(t.callback),
 	textXAlignment = t.literal("Left", "Center", "Right"),
+	focusChanged = t.optional(t.callback),
 
 	theme = t.table,
 })
@@ -111,10 +113,10 @@ function TextBox:init()
 		if self.props.focusLost then
 			self.props.focusLost(text, enterPressed)
 		end
-		self.updateFocused(false)
+		self:setFocused(false)
 	end
 	self.onFocused = function(rbx)
-		self.updateFocused(true)
+		self:setFocused(true)
 	end
 	self.onTextChanged = function(rbx)
 		self.updateText(rbx.Text)
@@ -247,6 +249,13 @@ function TextBox:updateClipping()
 	end
 
 	self.updateTextBoxPosition(newPosition)
+end
+
+function TextBox:setFocused(focused)
+	self.updateFocused(focused)
+	if self.props.focusChanged then
+		self.props.focusChanged(focused)
+	end
 end
 
 return ThemeContext.connect(TextBox, function(theme)

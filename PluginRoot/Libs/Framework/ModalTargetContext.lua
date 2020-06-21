@@ -1,6 +1,9 @@
 local PluginRoot = script:FindFirstAncestor("PluginRoot")
 local load = require(PluginRoot.Loader).load
 
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+
 local Roact = load("Roact")
 local Maid = load("Maid")
 local Oyrc = load("Oyrc")
@@ -17,16 +20,66 @@ function ModalTargetController:init()
 		modalTarget = modalTarget,
 	}
 
+	local getMousePosition
+	local layerCollector = modalTarget:IsA("LayerCollector") or modalTarget:FindFirstAncestorWhichIsA("LayerCollector")
+	if layerCollector then
+		if layerCollector:IsA("PluginGui") then
+			getMousePosition = function()
+				return layerCollector:GetRelativeMousePosition()
+			end
+		elseif layerCollector:IsA("ScreenGui") then
+			getMousePosition = function()
+				return UserInputService:GetMouseLocation()
+			end
+		else
+			error("ModalTarget only supported for GUI parented under PluginGui or ScreenGui.")
+		end
+	else
+		error("ModalTarget must be parented under PluginGui or ScreenGui.")
+	end
+
 	self.absoluteSize, self.updateAbsoluteSize = Roact.createBinding(modalTarget.AbsoluteSize)
 	self.absolutePosition, self.updateAbsolutePosition = Roact.createBinding(modalTarget.AbsolutePosition)
+	self.mousePosition, self.updateMousePosition = Roact.createBinding(getMousePosition())
+	self.absoluteSizeChangedEvent = Instance.new("BindableEvent")
+	self.absolutePositionChangedEvent = Instance.new("BindableEvent")
+	self.mousePositionChangedEvent = Instance.new("BindableEvent")
 
 	self.maid = Maid.new()
 	self.maid:GiveTask(self.state.modalTarget:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
-		self.updateAbsoluteSize(self.state.modalTarget.AbsoluteSize)
+		self.updateAbsoluteSize(modalTarget.AbsoluteSize)
+		self.absoluteSizeChangedEvent:Fire(modalTarget.AbsoluteSize)
 	end))
 	self.maid:GiveTask(self.state.modalTarget:GetPropertyChangedSignal("AbsolutePosition"):Connect(function()
-		self.updateAbsolutePosition(self.state.modalTarget.AbsolutePosition)
+		self.updateAbsolutePosition(modalTarget.AbsolutePosition)
+		self.absolutePositionChangedEvent:Fire(modalTarget.AbsolutePosition)
 	end))
+	self.maid:GiveTask(RunService.RenderStepped:Connect(function()
+		local mousePosition = getMousePosition()
+		if mousePosition ~= self.mousePosition:getValue() then
+			self.updateMousePosition(mousePosition)
+			self.mousePositionChangedEvent:Fire(mousePosition)
+		end
+	end))
+
+	self.subscribeToAbsolutePositionChanged = function(callback)
+		local conn = self.absolutePositionChangedEvent.Event:Connect(callback)
+		return function()
+			conn:Disconnect()
+		end
+	end
+	self.subscribeToAbsolutePositionChanged = function(callback)
+		local conn = self.absolutePositionChangedEvent.Event:Connect(callback)
+		return function()
+			conn:Disconnect()
+		end
+	end
+	self.subscribeToMousePositionChanged = function(callback)
+		local conn = self.absolutePositionChangedEvent.Event:Connect(callback)
+		return function()
+			conn:Disconnect()
+		end
+	end
 end
 
 function ModalTargetController:render()
@@ -35,6 +88,10 @@ function ModalTargetController:render()
 			target = self.state.modalTarget,
 			absolutePositionBinding = self.absolutePosition,
 			absoluteSizeBinding = self.absoluteSize,
+			mousePositionBinding = self.mousePosition,
+			subscribeToAbsolutePositionChanged = self.subscribeToAbsolutePositionChanged,
+			subscribeToAbsoluteSizeChanged = self.subscribeToAbsoluteSizeChanged,
+			subscribeToMousePositionChanged = self.subscribeToMousePositionChanged,
 		},
 	}, self.props[Roact.Children])
 end

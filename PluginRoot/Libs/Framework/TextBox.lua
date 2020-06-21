@@ -111,7 +111,10 @@ function TextBox:init()
 	self.onFocusLost = function(rbx, enterPressed, inputThatCausedLostFocus)
 		local text = rbx.Text
 		if self.props.focusLost then
-			self.props.focusLost(text, enterPressed)
+			local replacementText = self.props.focusLost(text, enterPressed)
+			if replacementText then
+				self.updateText(replacementText)
+			end
 		end
 		self:setFocused(false)
 	end

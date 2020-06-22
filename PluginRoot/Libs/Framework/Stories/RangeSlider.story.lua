@@ -16,9 +16,9 @@ function RangeSliderStory:init()
 end
 
 function RangeSliderStory:render()
-	local rangeSlider = e(RangeSlider, {
-		size = UDim2.new(0, 200, 0, 24),
-		position = UDim2.new(0, 100, 0, 100),
+	local snapSlider = e(RangeSlider, {
+		size = UDim2.new(0, 213, 0, 24),
+		position = UDim2.new(0, 24, 0, 24),
 		valueChanged = function(value)
 			self:setState({
 				value = value,
@@ -32,9 +32,24 @@ function RangeSliderStory:render()
 		displayRound = 4,
 	})
 
-	local rangeSliderDisabled = e(RangeSlider, {
-		size = UDim2.new(0, 200, 0, 24),
-		position = UDim2.new(0, 100, 0, 130),
+	local freeSlider = e(RangeSlider, {
+		size = UDim2.new(0, 213, 0, 24),
+		position = UDim2.new(0, 24, 0, 52),
+		valueChanged = function(value)
+			self:setState({
+				value = value,
+			})
+		end,
+		value = self.state.value,
+		min = 0,
+		max = 10,
+		editRound = 4,
+		displayRound = 4,
+	})
+
+	local disabledSlider = e(RangeSlider, {
+		size = UDim2.new(0, 213, 0, 24),
+		position = UDim2.new(0, 24, 0, 80),
 		value = self.state.value,
 		min = -5,
 		max = 5,
@@ -42,7 +57,7 @@ function RangeSliderStory:render()
 	})
 
 	return Roact.createFragment({
-		rangeSlider, rangeSliderDisabled,
+		snapSlider, freeSlider, disabledSlider,
 	})
 end
 

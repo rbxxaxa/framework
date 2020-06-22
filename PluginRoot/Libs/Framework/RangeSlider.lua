@@ -2,6 +2,7 @@ local PluginRoot = script:FindFirstAncestor("PluginRoot")
 local load = require(PluginRoot.Loader).load
 
 local RunService = game:GetService("RunService")
+local TextService = game:GetService("TextService")
 
 local Roact = load("Roact")
 local t = load("t")
@@ -10,7 +11,6 @@ local TextBox = load("Framework/TextBox")
 local ThemeContext = load("Framework/ThemeContext")
 local ModalTargetContext = load("Framework/ModalTargetContext")
 local ShadowedFrame = load("Framework/ShadowedFrame")
-local BorderedFrame = load("Framework/BorderedFrame")
 local Constants = load("Framework/Constants")
 
 local e = Roact.createElement
@@ -316,6 +316,13 @@ function RangeSlider:init()
 	self.sliderArrowTextVisible = self.dragging:map(function(dragging)
 		return not dragging
 	end)
+
+	self.sliderArrowBackerSize = self.sliderArrowText:map(function(text)
+		local textSize = TextService:GetTextSize(text, 14,
+			Constants.FONT_DEFAULT, Vector2.new(9999, 9999))
+
+		return UDim2.new(0, textSize.X + 8, 0, 14)
+	end)
 end
 
 function RangeSlider:render()
@@ -327,7 +334,6 @@ function RangeSlider:render()
 	local zIndex = props.zIndex
 	local disabled = props.disabled
 	local modalTarget = props.modalTarget
-	local theme = props.theme
 
 	local fillPercent = (self.props.value-self.props.min) / (self.props.max-self.props.min)
 
@@ -427,13 +433,24 @@ function RangeSlider:render()
 							Size = UDim2.new(0, 100, 0, 14),
 							TextSize = 14,
 							Font = Constants.FONT_DEFAULT,
-							Position = UDim2.new(0.5, 0, 0, 2),
+							Position = UDim2.new(0.5, 0, 0, 0),
 							AnchorPoint = Vector2.new(0.5, 1),
 							Text = self.sliderArrowText,
 							TextColor3 = Color3.new(1, 1, 1),
 							TextStrokeColor3 = Color3.new(0, 0, 0),
 							TextStrokeTransparency = 0,
 							BackgroundTransparency = 1,
+							Visible = self.sliderArrowTextVisible,
+							ZIndex = 2,
+						}),
+
+						Backer = e("Frame", {
+							Size = self.sliderArrowBackerSize,
+							BackgroundColor3 = Color3.new(0, 0, 0),
+							BackgroundTransparency = 0.2,
+							BorderSizePixel = 0,
+							Position = UDim2.new(0.5, 0, 0, 1),
+							AnchorPoint = Vector2.new(0.5, 1),
 							Visible = self.sliderArrowTextVisible,
 						}),
 					}),

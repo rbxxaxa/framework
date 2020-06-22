@@ -108,11 +108,19 @@ function TextBox:init()
 		RunService.RenderStepped:Wait()
 		self:updateClipping()
 	end
-	self.onFocusLost = function(rbx, enterPressed, inputThatCausedLostFocus)
+	self.onFocusLost = function(rbx, _, inputThatCausedLostFocus)
 		self.updateFocused(false)
 		local text = rbx.Text
 		if self.props.focusLost then
-			local replacementText = self.props.focusLost(text, enterPressed)
+			local cause
+			if inputThatCausedLostFocus.KeyCode == Enum.KeyCode.Escape then
+				cause = "Cancelled"
+			elseif inputThatCausedLostFocus.KeyCode == Enum.KeyCode.Return then
+				cause = "Submitted"
+			else
+				cause = "ClickedOut"
+			end
+			local replacementText = self.props.focusLost(text, cause)
 			if replacementText then
 				self.updateText(replacementText)
 			end

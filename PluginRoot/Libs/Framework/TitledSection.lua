@@ -5,6 +5,7 @@ local Roact = load("Roact")
 local t = load("t")
 local ThemeContext = load("Framework/ThemeContext")
 local Constants = load("Framework/Constants")
+local BorderedFrame = load("Framework/BorderedFrame")
 
 local e = Roact.createElement
 
@@ -73,29 +74,40 @@ function TitledSection:render()
 			AnchorPoint = anchorPoint,
 			ZIndex = zIndex,
 		}, {
-			Header = e("Frame", {
-				Size = UDim2.new(1, 0, 0, HEADER_HEIGHT),
-				BackgroundColor3 = colors.TitledSectionTitleBackground.Default,
+			BorderedFrame = e(BorderedFrame, {
+				size = UDim2.new(1, 0, 1, 0),
+				borderStyle = "Round",
+				backgroundColor = colors.TitledSectionBackground.Default,
+				borderColor = colors.Border.Default,
+			}),
+
+			Sep = e("Frame", {
+				Size = UDim2.new(1, -8, 0, 1),
+				Position = UDim2.new(0, 4, 0, HEADER_HEIGHT),
+				BackgroundColor3 = colors.Border.Default,
 				BorderSizePixel = 0,
-			}, {
-				TitleText = e("TextLabel", {
-					BackgroundTransparency = 1,
-					Text = title,
-					Position = UDim2.new(0, 8, 0, 0),
-					Size = UDim2.new(1, 0, 0, HEADER_HEIGHT),
-					Font = Constants.FONT_BOLD,
-					TextSize = Constants.TEXT_SIZE_LARGE,
-					TextXAlignment = Enum.TextXAlignment.Left,
-					TextColor3 = colors.MainText.Default,
-					TextTruncate = Enum.TextTruncate.AtEnd,
-				}),
+				ZIndex = 2,
+			}),
+
+			TitleText = e("TextLabel", {
+				BackgroundTransparency = 1,
+				Text = title,
+				Position = UDim2.new(0, 10, 0, 0),
+				Size = UDim2.new(1, 0, 0, HEADER_HEIGHT),
+				Font = Constants.FONT_BOLD,
+				TextSize = Constants.TEXT_SIZE_LARGE,
+				TextXAlignment = Enum.TextXAlignment.Left,
+				TextColor3 = colors.TitleText.Default,
+				TextTruncate = Enum.TextTruncate.AtEnd,
+				ZIndex = 2,
 			}),
 
 			Content = e("Frame", {
-				BackgroundColor3 = colors.TitledSectionContentBackground.Default,
 				Size = UDim2.new(1, 0, 1, -HEADER_HEIGHT),
 				Position = UDim2.new(0, 0, 0, HEADER_HEIGHT),
 				BorderSizePixel = 0,
+				BackgroundTransparency = 1,
+				ZIndex = 2,
 			}, {
 				Roact.createFragment({
 					TitledSectionUIListLayout = e("UIListLayout", {

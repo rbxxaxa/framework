@@ -50,13 +50,13 @@ function Theme.new()
 			Default = c(41, 41, 41),
 		},
 		ScrollingFrameContentBackground = {
-			Default = c(37, 37, 37),
-		},
-		TitledSectionTitleBackground = {
-			Default = c(53, 53, 53),
-		},
-		TitledSectionContentBackground = {
 			Default = c(46, 46, 46),
+		},
+		TitleText = {
+			Default = c(170, 170, 170),
+		},
+		TitledSectionBackground = {
+			Default = c(53, 53, 53),
 		},
 		DropdownChoiceBackground = {
 			Default = c(46, 46, 46),
@@ -114,6 +114,9 @@ function Theme.new()
 			PressedIn = c(80, 181, 255),
 			PressedOut = c(80, 181, 255),
 		},
+		Border = {
+			Default = c(40, 40, 40),
+		}
 	}
 
 	return setmetatable(self, Theme)

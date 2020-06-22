@@ -95,12 +95,12 @@ function Dropdown:init()
 		open = self.open,
 		buttonState = self.buttonState,
 		disabled = self.disabled,
-	}):map(function(mapped)
-		if mapped.disabled then
+	}):map(function(joined)
+		if joined.disabled then
 			return "Disabled"
-		elseif mapped.open then
+		elseif joined.open then
 			return "Focused"
-		elseif mapped.buttonState == "Hovered" then
+		elseif joined.buttonState == "Hovered" then
 			return "Hovered"
 		else
 			return "Default"
@@ -125,10 +125,10 @@ function Dropdown:init()
 		buttonAbsoluteSize = self.buttonAbsoluteSize,
 		buttonAbsolutePosition = self.buttonAbsolutePosition,
 		targetAbsolutePosition = self.props.modalTarget.absolutePositionBinding,
-	}):map(function(mapped)
-		local absoluteSize, absolutePosition = mapped.buttonAbsoluteSize, mapped.buttonAbsolutePosition
-		local x = absolutePosition.X - mapped.targetAbsolutePosition.X
-		local y = absolutePosition.Y + absoluteSize.Y - mapped.targetAbsolutePosition.Y + 3
+	}):map(function(joined)
+		local absoluteSize, absolutePosition = joined.buttonAbsoluteSize, joined.buttonAbsolutePosition
+		local x = absolutePosition.X - joined.targetAbsolutePosition.X
+		local y = absolutePosition.Y + absoluteSize.Y - joined.targetAbsolutePosition.Y + 3
 		return UDim2.new(0, x, 0, y)
 	end)
 

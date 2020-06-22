@@ -44,8 +44,8 @@ function TitledSection:init()
 	self.size = Roact.joinBindings({
 		contentHeight = self.contentHeight,
 		width = self.width,
-	}):map(function(mapped)
-		return UDim2.new(mapped.width, UDim.new(0, mapped.contentHeight + HEADER_HEIGHT + 8))
+	}):map(function(joined)
+		return UDim2.new(joined.width, UDim.new(0, joined.contentHeight + HEADER_HEIGHT + 8))
 	end)
 
 	self.onAbsoluteContentSizeChanged = function(rbx)

@@ -50,11 +50,11 @@ function TextButton:init()
 	local buttonAppearance = Roact.joinBindings({
 		disabled = self.disabled,
 		buttonState = self.buttonState,
-	}):map(function(mapped)
-		if mapped.disabled then
+	}):map(function(joined)
+		if joined.disabled then
 			return "Disabled"
 		else
-			return mapped.buttonState
+			return joined.buttonState
 		end
 	end)
 

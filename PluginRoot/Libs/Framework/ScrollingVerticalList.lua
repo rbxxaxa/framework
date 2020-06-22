@@ -62,8 +62,8 @@ function ScrollingVerticalList:init()
 		contentHeight = self.contentHeight,
 		paddingTop = self.paddingTop,
 		paddingBottom = self.paddingBottom,
-	}):map(function(mapped)
-		return UDim2.new(1, 0, 0, mapped.contentHeight + mapped.paddingTop + mapped.paddingBottom)
+	}):map(function(joined)
+		return UDim2.new(1, 0, 0, joined.contentHeight + joined.paddingTop + joined.paddingBottom)
 	end)
 end
 

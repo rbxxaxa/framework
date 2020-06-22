@@ -202,63 +202,63 @@ function RangeSlider:init()
 	})
 
 	-- Left blocker
-	self.leftBlockerPosition = modalBinding:map(function(mapped)
+	self.leftBlockerPosition = modalBinding:map(function(joined)
 		local x = 0
 		local y = 0
 		return UDim2.new(0, x, 0, y)
 	end)
-	self.leftBlockerSize = modalBinding:map(function(mapped)
-		local x = mapped.absolutePosition.X - mapped.targetAbsolutePosition.X
-		local y = mapped.targetAbsoluteSize.Y
+	self.leftBlockerSize = modalBinding:map(function(joined)
+		local x = joined.absolutePosition.X - joined.targetAbsolutePosition.X
+		local y = joined.targetAbsoluteSize.Y
 		return UDim2.new(0, x, 0, y)
 	end)
 
 	-- Top blocker
-	self.topBlockerPosition = modalBinding:map(function(mapped)
-		local x = mapped.absolutePosition.X - mapped.targetAbsolutePosition.X
+	self.topBlockerPosition = modalBinding:map(function(joined)
+		local x = joined.absolutePosition.X - joined.targetAbsolutePosition.X
 		local y = 0
 		return UDim2.new(0, x, 0, y)
 	end)
-	self.topBlockerSize = modalBinding:map(function(mapped)
-		local x = mapped.absoluteSize.X
-		local y = mapped.absolutePosition.Y - mapped.targetAbsolutePosition.Y
+	self.topBlockerSize = modalBinding:map(function(joined)
+		local x = joined.absoluteSize.X
+		local y = joined.absolutePosition.Y - joined.targetAbsolutePosition.Y
 		return UDim2.new(0, x, 0, y)
 	end)
 
 	-- Right blocker
-	self.rightBlockerPosition = modalBinding:map(function(mapped)
-		local x = mapped.absolutePosition.X + mapped.absoluteSize.X - mapped.targetAbsolutePosition.X
+	self.rightBlockerPosition = modalBinding:map(function(joined)
+		local x = joined.absolutePosition.X + joined.absoluteSize.X - joined.targetAbsolutePosition.X
 		local y = 0
 		return UDim2.new(0, x, 0, y)
 	end)
-	self.rightBlockerSize = modalBinding:map(function(mapped)
-		local x = mapped.targetAbsoluteSize.X - (mapped.absolutePosition.X - mapped.targetAbsolutePosition.X)
-			- mapped.absoluteSize.X
-		local y = mapped.targetAbsoluteSize.Y
+	self.rightBlockerSize = modalBinding:map(function(joined)
+		local x = joined.targetAbsoluteSize.X - (joined.absolutePosition.X - joined.targetAbsolutePosition.X)
+			- joined.absoluteSize.X
+		local y = joined.targetAbsoluteSize.Y
 		return UDim2.new(0, x, 0, y)
 	end)
 
 	-- Bottom blocker
-	self.bottomBlockerPosition = modalBinding:map(function(mapped)
-		local x = mapped.absolutePosition.X - mapped.targetAbsolutePosition.X
-		local y = mapped.absolutePosition.Y - mapped.targetAbsolutePosition.Y + mapped.absoluteSize.Y
+	self.bottomBlockerPosition = modalBinding:map(function(joined)
+		local x = joined.absolutePosition.X - joined.targetAbsolutePosition.X
+		local y = joined.absolutePosition.Y - joined.targetAbsolutePosition.Y + joined.absoluteSize.Y
 		return UDim2.new(0, x, 0, y)
 	end)
-	self.bottomBlockerSize = modalBinding:map(function(mapped)
-		local x = mapped.absoluteSize.X
-		local y = mapped.targetAbsoluteSize.Y - (mapped.absolutePosition.Y - mapped.targetAbsolutePosition.Y)
-			- mapped.absoluteSize.Y
+	self.bottomBlockerSize = modalBinding:map(function(joined)
+		local x = joined.absoluteSize.X
+		local y = joined.targetAbsoluteSize.Y - (joined.absolutePosition.Y - joined.targetAbsolutePosition.Y)
+			- joined.absoluteSize.Y
 		return UDim2.new(0, x, 0, y)
 	end)
 
 	-- Dragger frame
-	self.draggerFramePosition = modalBinding:map(function(mapped)
-		local x = mapped.absolutePosition.X - mapped.targetAbsolutePosition.X
-		local y = mapped.absolutePosition.Y - mapped.targetAbsolutePosition.Y + mapped.absoluteSize.Y + 6
+	self.draggerFramePosition = modalBinding:map(function(joined)
+		local x = joined.absolutePosition.X - joined.targetAbsolutePosition.X
+		local y = joined.absolutePosition.Y - joined.targetAbsolutePosition.Y + joined.absoluteSize.Y + 6
 		return UDim2.new(0, x, 0, y)
 	end)
-	self.draggerFrameSize = modalBinding:map(function(mapped)
-		local x = mapped.absoluteSize.X
+	self.draggerFrameSize = modalBinding:map(function(joined)
+		local x = joined.absoluteSize.X
 		local y = 12
 		return UDim2.new(0, x, 0, y)
 	end)
@@ -287,10 +287,10 @@ function RangeSlider:init()
 		fillPercent = self.fillPercent,
 		dragging = self.dragging,
 		mousePosition = self.props.modalTarget.mousePositionBinding,
-	}):map(function(mapped)
+	}):map(function(joined)
 		local percent
-		if mapped.dragging then
-			percent = mapped.fillPercent
+		if joined.dragging then
+			percent = joined.fillPercent
 		else
 			percent = self:calculateDragPercent()
 			if self.props.step then
@@ -303,8 +303,8 @@ function RangeSlider:init()
 	self.sliderArrowPosition = Roact.joinBindings({
 		percent = self.sliderArrowPercent,
 		dragging = self.dragging,
-	}):map(function(mapped)
-		return UDim2.new(mapped.percent, 0, 0, mapped.dragging and -4 or -6)
+	}):map(function(joined)
+		return UDim2.new(joined.percent, 0, 0, joined.dragging and -4 or -6)
 	end)
 	self.sliderArrowText = self.sliderArrowPercent:map(function(percent)
 		local value = self.props.min + (self.props.max-self.props.min) * percent

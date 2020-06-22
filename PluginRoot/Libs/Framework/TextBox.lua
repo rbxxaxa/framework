@@ -66,12 +66,12 @@ function TextBox:init()
 		disabled = self.disabled,
 		buttonState = self.buttonState,
 		focused = self.focused,
-	}):map(function(mapped)
-		if mapped.disabled then
+	}):map(function(joined)
+		if joined.disabled then
 			return "Disabled"
-		elseif mapped.focused then
+		elseif joined.focused then
 			return "Focused"
-		elseif mapped.buttonState == "Hovered" then
+		elseif joined.buttonState == "Hovered" then
 			return "Hovered"
 		else
 			return "Default"
@@ -80,11 +80,11 @@ function TextBox:init()
 	self.textInTextLabel = Roact.joinBindings({
 		placeholderText = self.placeholderText,
 		text = self.text,
-	}):map(function(mapped)
-		if mapped.text == "" then
-			return mapped.placeholderText
+	}):map(function(joined)
+		if joined.text == "" then
+			return joined.placeholderText
 		else
-			return mapped.text
+			return joined.text
 		end
 	end)
 	self.backgroundColor = self.appearanceState:map(function(appearanceState)

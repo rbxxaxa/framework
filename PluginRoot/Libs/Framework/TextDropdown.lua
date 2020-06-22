@@ -76,12 +76,12 @@ function TextDropdown:init()
 		buttonState = self.buttonState,
 		open = self.open,
 		disabled = self.disabled,
-	}):map(function(mapped)
-		if mapped.disabled then
+	}):map(function(joined)
+		if joined.disabled then
 			return "Disabled"
-		elseif mapped.open then
+		elseif joined.open then
 			return "Focused"
-		elseif mapped.buttonState == "Hovered" then
+		elseif joined.buttonState == "Hovered" then
 			return "Hovered"
 		else
 			return "Default"

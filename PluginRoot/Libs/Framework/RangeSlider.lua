@@ -263,18 +263,19 @@ function RangeSlider:init()
 		return UDim2.new(0, x, 0, y)
 	end)
 
+	-- Slider bars
 	self.sliderBarBackgroundColor = self.draggerButtonState:map(function(buttonState)
 		local colors = self.props.theme.colors
 
 		return colors.SliderBarBackground[buttonState]
 	end)
-
 	self.sliderBarFillColor = self.draggerButtonState:map(function(buttonState)
 		local colors = self.props.theme.colors
 
 		return colors.SliderBarFill[buttonState]
 	end)
 
+	-- Slider arrow
 	self.sliderArrowVisible = self.draggerButtonState:map(function(buttonState)
 		if buttonState == "Default" then
 			return false
@@ -282,7 +283,6 @@ function RangeSlider:init()
 			return true
 		end
 	end)
-
 	self.sliderArrowPercent = Roact.joinBindings({
 		fillPercent = self.fillPercent,
 		dragging = self.dragging,
@@ -300,29 +300,27 @@ function RangeSlider:init()
 
 		return percent
 	end)
-
 	self.sliderArrowPosition = Roact.joinBindings({
 		percent = self.sliderArrowPercent,
 		dragging = self.dragging,
 	}):map(function(mapped)
 		return UDim2.new(mapped.percent, 0, 0, mapped.dragging and -4 or -6)
 	end)
-
 	self.sliderArrowText = self.sliderArrowPercent:map(function(percent)
 		local value = self.props.min + (self.props.max-self.props.min) * percent
 		return tostring(self.valueToDisplayText(value))
 	end)
-
 	self.sliderArrowTextVisible = self.dragging:map(function(dragging)
 		return not dragging
 	end)
-
 	self.sliderArrowBackerSize = self.sliderArrowText:map(function(text)
 		local textSize = TextService:GetTextSize(text, 14,
 			Constants.FONT_DEFAULT, Vector2.new(9999, 9999))
 
 		return UDim2.new(0, textSize.X + 8, 0, 14)
 	end)
+
+	-- TODO: Make esc close the bar.
 end
 
 function RangeSlider:render()

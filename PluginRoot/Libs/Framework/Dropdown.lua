@@ -180,6 +180,8 @@ function Dropdown:init()
 			end
 		end
 	end
+
+	-- TODO: Make esc close the dropdown.
 end
 
 function Dropdown:didUpdate(prevProps, prevState)

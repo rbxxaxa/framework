@@ -16,6 +16,14 @@ local e = Roact.createElement
 
 local RangeSlider = Roact.Component:extend("RangeSlider")
 
+local function eval(expr)
+	local f = loadstring("return " .. expr)
+	local ok, result = pcall(f)
+	if ok then
+		return result
+	end
+end
+
 RangeSlider.defaultProps = {
 	size = UDim2.new(0, 100, 0, 24),
 	position = UDim2.new(),
@@ -152,8 +160,12 @@ function RangeSlider:init()
 			return editText
 		end
 	end
-	self.onTextBoxFocusLost = function(text)
-		local newValue = tonumber(text)
+	self.onTextBoxFocusLost = function(text, cause)
+		if cause == "Cancelled" then
+			return self.valueToDisplayText(self.props.value)
+		end
+
+		local newValue = eval(text)
 		if newValue == nil then
 			return self.valueToDisplayText(self.props.value)
 		end

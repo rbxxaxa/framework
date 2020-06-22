@@ -16,6 +16,10 @@ local e = Roact.createElement
 
 local RangeSlider = Roact.Component:extend("RangeSlider")
 
+--[[
+	TODO: This executes arbitrary Lua code pretty much. Make this more secure
+	by filtering out non-math characters.
+]]
 local function eval(expr)
 	local f = loadstring("return " .. expr)
 	local ok, result = pcall(f)

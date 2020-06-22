@@ -84,6 +84,10 @@ RangeSlider.validateProps = function(props)
 		return false, "editRound only supports positive values."
 	end
 
+	if props.step and props.step <= 0 then
+		return false, "step must be positive. To disable snapping, use step = nil."
+	end
+
 	return true
 end
 

@@ -23,8 +23,8 @@ local RangeSlider = Roact.Component:extend("RangeSlider")
 local function eval(expr)
 	local f = loadstring("return " .. expr)
 	local ok, result = pcall(f)
-	if ok then
-		return result
+	if ok and result then
+		return tonumber(result)
 	end
 end
 

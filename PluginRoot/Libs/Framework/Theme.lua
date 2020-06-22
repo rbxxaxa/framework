@@ -103,10 +103,16 @@ function Theme.new()
 			Disabled = c(53, 53, 53),
 		},
 		SliderBarBackground = {
-			Default = c(255, 255, 255),
+			Default = c(60, 60, 60),
+			Hovered = c(66, 66, 66),
+			PressedIn = c(66, 66, 66),
+			PressedOut = c(66, 66, 66),
 		},
 		SliderBarFill = {
-			Default = c(51, 181, 255),
+			Default = c(0, 181, 255),
+			Hovered = c(80, 181, 255),
+			PressedIn = c(80, 181, 255),
+			PressedOut = c(80, 181, 255),
 		},
 	}
 

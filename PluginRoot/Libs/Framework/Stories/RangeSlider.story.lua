@@ -25,10 +25,11 @@ function RangeSliderStory:render()
 			})
 		end,
 		value = self.state.value,
-		min = -5,
-		max = 5,
-		editRound = 6,
-		displayRound = 2,
+		min = 0,
+		max = 10,
+		step = 0.5,
+		editRound = 4,
+		displayRound = 4,
 	})
 
 	local rangeSliderDisabled = e(RangeSlider, {

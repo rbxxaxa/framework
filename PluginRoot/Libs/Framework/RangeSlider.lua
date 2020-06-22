@@ -11,6 +11,7 @@ local ThemeContext = load("Framework/ThemeContext")
 local ModalTargetContext = load("Framework/ModalTargetContext")
 local ShadowedFrame = load("Framework/ShadowedFrame")
 local BorderedFrame = load("Framework/BorderedFrame")
+local Constants = load("Framework/Constants")
 
 local e = Roact.createElement
 
@@ -101,7 +102,11 @@ function RangeSlider:init()
 		open = false,
 	}
 
+	local fillPercent = (self.props.value-self.props.min) / (self.props.max-self.props.min)
+
 	self.open, self.updateOpen = Roact.createBinding(false)
+	self.dragging, self.updateDragging = Roact.createBinding(false)
+	self.fillPercent, self.updateFillPercent = Roact.createBinding(fillPercent)
 	self.absoluteSize, self.updateAbsoluteSize = Roact.createBinding(Vector2.new(0, 0))
 	self.absolutePosition, self.updateAbsolutePosition = Roact.createBinding(Vector2.new(0, 0))
 	self.draggerButtonState, self.updateDraggerButtonState = Roact.createBinding("Default")
@@ -119,12 +124,12 @@ function RangeSlider:init()
 		self.updateMousePosition(Vector2.new(x, y))
 	end
 	self.onActivatedChanged = function(activated)
-		self.dragging = activated
+		self.updateDragging(activated)
 		local dragPercent = self:calculateDragPercent()
 		self.onValueDragged(dragPercent)
 	end
 	self.hConn = RunService.RenderStepped:Connect(function()
-		if self.dragging then
+		if self.dragging:getValue() then
 			local dragPercent = self:calculateDragPercent()
 			self.onValueDragged(dragPercent)
 		end
@@ -258,24 +263,58 @@ function RangeSlider:init()
 		return UDim2.new(0, x, 0, y)
 	end)
 
-	-- Faux button
-	self.fauxButtonBackgroundColor = self.draggerButtonState:map(function(buttonState)
+	self.sliderBarBackgroundColor = self.draggerButtonState:map(function(buttonState)
 		local colors = self.props.theme.colors
 
-		if buttonState == "PressedIn" or buttonState == "PressedOut" then
-			return colors.Button.PressedIn
+		return colors.SliderBarBackground[buttonState]
+	end)
+
+	self.sliderBarFillColor = self.draggerButtonState:map(function(buttonState)
+		local colors = self.props.theme.colors
+
+		return colors.SliderBarFill[buttonState]
+	end)
+
+	self.sliderArrowVisible = self.draggerButtonState:map(function(buttonState)
+		if buttonState == "Default" then
+			return false
 		else
-			return colors.Button[buttonState]
+			return true
 		end
 	end)
-	self.fauxButtonBorderColor = self.draggerButtonState:map(function(buttonState)
-		local colors = self.props.theme.colors
 
-		if buttonState == "PressedIn" or buttonState == "PressedOut" then
-			return colors.ButtonBorder.PressedIn
+	self.sliderArrowPercent = Roact.joinBindings({
+		fillPercent = self.fillPercent,
+		dragging = self.dragging,
+		mousePosition = self.props.modalTarget.mousePositionBinding,
+	}):map(function(mapped)
+		local percent
+		if mapped.dragging then
+			percent = mapped.fillPercent
 		else
-			return colors.ButtonBorder[buttonState]
+			percent = self:calculateDragPercent()
+			if self.props.step then
+				percent = round(percent, self.props.step/(self.props.max-self.props.min))
+			end
 		end
+
+		return percent
+	end)
+
+	self.sliderArrowPosition = Roact.joinBindings({
+		percent = self.sliderArrowPercent,
+		dragging = self.dragging,
+	}):map(function(mapped)
+		return UDim2.new(mapped.percent, 0, 0, mapped.dragging and -4 or -6)
+	end)
+
+	self.sliderArrowText = self.sliderArrowPercent:map(function(percent)
+		local value = self.props.min + (self.props.max-self.props.min) * percent
+		return tostring(self.valueToDisplayText(value))
+	end)
+
+	self.sliderArrowTextVisible = self.dragging:map(function(dragging)
+		return not dragging
 	end)
 end
 
@@ -291,7 +330,6 @@ function RangeSlider:render()
 	local theme = props.theme
 
 	local fillPercent = (self.props.value-self.props.min) / (self.props.max-self.props.min)
-	local colors = theme.colors
 
 	return Roact.createFragment({
 		TextBoxContainer = e("Frame", {
@@ -365,24 +403,39 @@ function RangeSlider:render()
 
 					BarBackground = e("Frame", {
 						Size = UDim2.new(1, 0, 1, 0),
-						BackgroundColor3 = colors.SliderBarBackground.Default,
+						BackgroundColor3 = self.sliderBarBackgroundColor,
 						BorderSizePixel = 0,
 					}),
 
 					BarFill = e("Frame", {
 						Size = UDim2.new(fillPercent, 0, 1, 0),
-						BackgroundColor3 = colors.SliderBarFill.Default,
+						BackgroundColor3 = self.sliderBarFillColor,
 						BorderSizePixel = 0,
 						ZIndex = 2,
 					}),
 
-					FauxButton = e(BorderedFrame, {
-						size = UDim2.new(0, 6, 1, 6),
-						position = UDim2.new(fillPercent, 0, 0.5, 0),
-						anchorPoint = Vector2.new(0.5, 0.5),
-						backgroundColorBinding = self.fauxButtonBackgroundColor,
-						borderColorBinding = self.fauxButtonBorderColor,
-						zIndex = 3,
+					SliderArrow = e("ImageLabel", {
+						Size = UDim2.new(0, 11, 0, 11),
+						Position = self.sliderArrowPosition,
+						AnchorPoint = Vector2.new(0.5, 0),
+						BackgroundTransparency = 1,
+						Image = "rbxassetid://5217364860",
+						ZIndex = 3,
+						Visible = self.sliderArrowVisible,
+					}, {
+						ArrowText = e("TextLabel", {
+							Size = UDim2.new(0, 100, 0, 14),
+							TextSize = 14,
+							Font = Constants.FONT_DEFAULT,
+							Position = UDim2.new(0.5, 0, 0, 2),
+							AnchorPoint = Vector2.new(0.5, 1),
+							Text = self.sliderArrowText,
+							TextColor3 = Color3.new(1, 1, 1),
+							TextStrokeColor3 = Color3.new(0, 0, 0),
+							TextStrokeTransparency = 0,
+							BackgroundTransparency = 1,
+							Visible = self.sliderArrowTextVisible,
+						}),
 					}),
 				}),
 			}),
@@ -402,6 +455,11 @@ function RangeSlider:setOpen(open)
 	if self.props.openChanged then
 		self.props.openChanged(open)
 	end
+end
+
+function RangeSlider:didUpdate()
+	local fillPercent = (self.props.value-self.props.min) / (self.props.max-self.props.min)
+	self.updateFillPercent(fillPercent)
 end
 
 function RangeSlider:calculateDragPercent()

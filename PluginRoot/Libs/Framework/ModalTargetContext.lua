@@ -75,7 +75,7 @@ function ModalTargetController:init()
 		end
 	end
 	self.subscribeToMousePositionChanged = function(callback)
-		local conn = self.absolutePositionChangedEvent.Event:Connect(callback)
+		local conn = self.mousePositionChangedEvent.Event:Connect(callback)
 		return function()
 			conn:Disconnect()
 		end

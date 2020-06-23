@@ -1,2 +1,3 @@
-# plugin-template-2
- A template for my plugins!
+# framework
+
+A bunch of reusable components. WIP.

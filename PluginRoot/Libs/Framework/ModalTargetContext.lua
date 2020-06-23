@@ -20,8 +20,9 @@ function ModalTargetController:init()
 		modalTarget = modalTarget,
 	}
 
+	local layerCollector = modalTarget:IsA("LayerCollector") and modalTarget
+		or modalTarget:FindFirstAncestorWhichIsA("LayerCollector")
 	local getMousePosition
-	local layerCollector = modalTarget:IsA("LayerCollector") or modalTarget:FindFirstAncestorWhichIsA("LayerCollector")
 	if layerCollector then
 		if layerCollector:IsA("PluginGui") then
 			getMousePosition = function()
